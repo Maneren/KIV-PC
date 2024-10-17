@@ -1,0 +1,6 @@
+.cache
+*.o
+*.obj
+*.exe
+*.ps
+compile_commands.json
