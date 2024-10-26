@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 #define BYTE_TO_BINARY_PATTERN "%c%c%c%c%c%c%c%c"
 #define BYTE_TO_BINARY(byte)                                                   \
@@ -36,8 +37,6 @@ int init_vm_from_file(const char *path, VM *vm) {
     fprintf(stderr, "Invalid KMX file header: '%s'\n", path);
     return 2;
   }
-
-  printf("Header: '%s'\n", header);
 
   int data_size_header = 0;
 
@@ -89,17 +88,13 @@ int init_vm_from_file(const char *path, VM *vm) {
 
 int vm_run(VM *vm) {
 
+  clock_t start_time = clock();
   int halted = 0;
 
   // NOTE: jump instructions may modify the IP independently of this loop
-  for (vm->IP = 0; !halted && vm->IP < vm->code_size; vm->IP++) {
+  for (vm->IP = 0, vm->instructions_count = 0;
+       !halted && vm->IP < vm->code_size; vm->IP++, vm->instructions_count++) {
     vm_print(vm);
-    for (size_t i = 0; i < vm->data_size / sizeof(Number);
-         i += sizeof(Number)) {
-      printf("%d ", vm->data_segment[i]);
-    }
-
-    printf("\n");
 
     Byte instruction = vm->code_segment[vm->IP];
 
@@ -171,39 +166,47 @@ int vm_run(VM *vm) {
       return EXIT_FAILURE;
     }
 
-    if (instruction != 0x60 && instruction != 0x61) {
-      printf("Nulling: %02hhX\n", instruction);
+    if (instruction != 0x60 && instruction != 0x61)
       vm->flags = 0;
-    }
-
-    printf("\n");
   }
 
-  printf("Reached end of code\n");
+  printf("Halt instruction encountered. Halting...\n");
 
+  printf("Execution time: %.3f seconds (%zu instructions)\n",
+         (double)(clock() - start_time) / CLOCKS_PER_SEC,
+         vm->instructions_count);
+
+  printf("\nFinal state:\n");
   vm_print(vm);
 
   return 0;
 }
 
-void print_hex(char *data, size_t size) {
+void print_header() {
   printf("       %02X %02X %02X %02X"
          "  %02X %02X %02X %02X"
          "  %02X %02X %02X %02X"
          "  %02X %02X %02X %02X\n",
          0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
+}
 
-  for (size_t i = 0; i < size; i += 16) {
-    printf("%04lX: ", i);
-    for (size_t j = 0; j < 16; j++) {
-      if (j % 4 == 0)
-        printf(" ");
-
-      Byte value = (i + j < size) ? data[i + j] : 0;
-
-      printf("%02hhX ", value);
+void print_data_line(size_t index, const Byte *data, size_t size) {
+  printf("%04lX: ", index);
+  for (size_t j = 0; j < 16; j++) {
+    if (j % 4 == 0) {
+      printf(" ");
     }
-    printf("\n");
+
+    Byte value = (index + j < size) ? data[index + j] : 0;
+    printf("%02hhX ", value);
+  }
+  printf("\n");
+}
+
+void pretty_print_data(const Byte *data, size_t size) {
+  print_header();
+  for (size_t i = 0; i < size; i += 16) {
+    print_data_line(i, data, size);
   }
 }
 
@@ -219,10 +222,10 @@ void vm_print(const VM *vm) {
   printf("Flags: 0b" BYTE_TO_BINARY_PATTERN "\n", BYTE_TO_BINARY(vm->flags));
 
   printf("Data segment: (%lu)\n", vm->data_size);
-  print_hex(vm->data_segment, vm->data_size);
+  pretty_print_data(vm->data_segment, vm->data_size);
   printf("\n");
   printf("Code segment: (%lu)\n", vm->code_size);
-  print_hex(vm->code_segment, vm->code_size);
+  pretty_print_data(vm->code_segment, vm->code_size);
   printf("\n");
 }
 
