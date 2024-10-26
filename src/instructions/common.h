@@ -19,9 +19,9 @@
   }
 
 #ifdef INSTRUCTIONS_DEBUG
-#define DEBUG_PRINT printf
+#define DEBUG_PRINT(...) printf(__VA_ARGS__)
 #else
-#define DEBUG_PRINT
+#define DEBUG_PRINT(...)
 #endif
 
 int vm_set_reg(VM *vm, Byte reg, Number im32);
