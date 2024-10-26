@@ -158,6 +158,14 @@ int vm_run(VM *vm) {
       INSTRUCTION(0x77, vm_jl_im32);  // JL im32
       INSTRUCTION(0x78, vm_jle_im32); // JLE im32
       INSTRUCTION(0x79, vm_jnl_im32); // JNL im32
+
+      // IO INSTRUCTIONS
+      INSTRUCTION(0xF0, vm_outd_reg); // OUTD reg
+      INSTRUCTION(0xF1, vm_outc_reg); // OUTC reg
+      INSTRUCTION(0xF2, vm_outs_reg); // OUTS reg
+      INSTRUCTION(0xF3, vm_inpd_reg); // INPD reg
+      INSTRUCTION(0xF4, vm_inpc_reg); // INPC reg
+      INSTRUCTION(0xF5, vm_inps_reg); // INPS reg
     default:
       fprintf(stderr, "Unknown instruction: 0x%02x\n", instruction);
       return EXIT_FAILURE;
