@@ -3,7 +3,8 @@
 #include <stdio.h>
 
 int vm_push(VM *vm) {
-  Byte reg = vm->code_segment[vm->IP + 1];
+  Byte reg;
+  PROPAGATE_ERROR(vm_code_read_reg(vm, vm->IP + 1, &reg));
   vm->IP += sizeof(reg);
 
   DEBUG_PRINT("PUSH R%d\n", reg);
@@ -21,7 +22,7 @@ int vm_push(VM *vm) {
 }
 
 int vm_pop(VM *vm) {
-  Byte reg = vm->code_segment[vm->IP + 1];
+  Byte reg;
   vm->IP += sizeof(reg);
 
   DEBUG_PRINT("POP R%d\n", reg);

@@ -4,8 +4,10 @@
 #include <stdlib.h>
 
 int vm_mov_reg_im32(VM *vm) {
-  Byte reg = vm->code_segment[vm->IP + 1];
-  Number im32 = vm->code_segment[vm->IP + 2];
+  Byte reg;
+  Number im32;
+  PROPAGATE_ERROR(vm_code_read_reg(vm, vm->IP + 1, &reg));
+  PROPAGATE_ERROR(vm_code_read_im32(vm, vm->IP + 2, &im32));
   vm->IP += sizeof(reg) + sizeof(im32);
 
   DEBUG_PRINT("MOV R%d, %d\n", reg, im32);
@@ -14,8 +16,9 @@ int vm_mov_reg_im32(VM *vm) {
 }
 
 int vm_mov_reg_reg(VM *vm) {
-  Byte reg_d = vm->code_segment[vm->IP + 1];
-  Byte reg_s = vm->code_segment[vm->IP + 2];
+  Byte reg_d, reg_s;
+  PROPAGATE_ERROR(vm_code_read_reg(vm, vm->IP + 1, &reg_d));
+  PROPAGATE_ERROR(vm_code_read_reg(vm, vm->IP + 2, &reg_s));
   vm->IP += sizeof(reg_d) + sizeof(reg_s);
 
   DEBUG_PRINT("MOV R%d, R%d\n", reg_d, reg_s);
@@ -32,17 +35,18 @@ int vm_movsd(VM *vm) {
 
   DEBUG_PRINT("MOVSD\n");
 
-  ASSERT(source >= 0 && (size_t)source < vm->data_size);
-  ASSERT(destination >= 0 && (size_t)destination < vm->data_size);
-
-  vm->data_segment[destination] = vm->data_segment[source];
+  Number value;
+  PROPAGATE_ERROR(vm_read_im32(vm, source, &value));
+  PROPAGATE_ERROR(vm_write_im32(vm, destination, value))
 
   return EXIT_SUCCESS;
 }
 
 int vm_load_reg_im32(VM *vm) {
-  Byte reg = vm->code_segment[vm->IP + 1];
-  Number address = vm->code_segment[vm->IP + 2];
+  Byte reg;
+  Number address;
+  PROPAGATE_ERROR(vm_code_read_reg(vm, vm->IP + 1, &reg));
+  PROPAGATE_ERROR(vm_code_read_im32(vm, vm->IP + 2, &address));
   vm->IP += sizeof(reg) + sizeof(address);
 
   DEBUG_PRINT("LOAD R%d, %d\n", reg, address);
@@ -54,16 +58,15 @@ int vm_load_reg_im32(VM *vm) {
 }
 
 int vm_load_reg_reg(VM *vm) {
-  Byte reg_d = vm->code_segment[vm->IP + 1];
-  Byte reg_s = vm->code_segment[vm->IP + 2];
+  Byte reg_d, reg_s;
+  PROPAGATE_ERROR(vm_code_read_reg(vm, vm->IP + 1, &reg_d));
+  PROPAGATE_ERROR(vm_code_read_reg(vm, vm->IP + 2, &reg_s));
   vm->IP += sizeof(reg_d) + sizeof(reg_s);
 
   DEBUG_PRINT("LOAD R%d, R%d\n", reg_d, reg_s);
 
   Number address;
   PROPAGATE_ERROR(vm_get_reg(vm, reg_s, &address));
-
-  ASSERT(address >= 0 && (size_t)address < vm->data_size);
 
   Number value;
   PROPAGATE_ERROR(vm_read_im32(vm, address, &value));
@@ -72,13 +75,13 @@ int vm_load_reg_reg(VM *vm) {
 }
 
 int vm_stor_reg_im32(VM *vm) {
-  Byte reg = vm->code_segment[vm->IP + 1];
-  Number address = vm->code_segment[vm->IP + 2];
+  Byte reg;
+  Number address;
+  PROPAGATE_ERROR(vm_code_read_reg(vm, vm->IP + 1, &reg));
+  PROPAGATE_ERROR(vm_code_read_im32(vm, vm->IP + 2, &address));
   vm->IP += sizeof(reg) + sizeof(address);
 
   DEBUG_PRINT("STOR R%d, %d\n", reg, address);
-
-  ASSERT(address >= 0 && (size_t)address < vm->data_size);
 
   Number value;
   PROPAGATE_ERROR(vm_get_reg(vm, reg, &value));
@@ -89,17 +92,20 @@ int vm_stor_reg_im32(VM *vm) {
 }
 
 int vm_stor_reg_reg(VM *vm) {
-  Byte reg_s = vm->code_segment[vm->IP + 1];
-  Byte reg_d = vm->code_segment[vm->IP + 2];
+  Byte reg_s, reg_d;
+  PROPAGATE_ERROR(vm_code_read_reg(vm, vm->IP + 1, &reg_s));
+  PROPAGATE_ERROR(vm_code_read_reg(vm, vm->IP + 2, &reg_d));
   vm->IP += sizeof(reg_s) + sizeof(reg_d);
 
-  DEBUG_PRINT("STOR R%d, R%d\n", reg_d, reg_s);
+  DEBUG_PRINT("STOR R%d, R%d\n", reg_s, reg_d);
 
   Number address;
   PROPAGATE_ERROR(vm_get_reg(vm, reg_d, &address));
 
   Number value;
   PROPAGATE_ERROR(vm_get_reg(vm, reg_s, &value));
+
+  printf("STOR: %X, %X\n", address, value);
 
   PROPAGATE_ERROR(vm_write_im32(vm, address, value))
 
