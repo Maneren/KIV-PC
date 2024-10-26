@@ -17,7 +17,7 @@ clean:
 
 build: $(BIN)
 
-execute: build
+execute: $(BIN)
 	./$(BIN) $(ARGS)
 
 valgrind: build
