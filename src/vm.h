@@ -31,21 +31,22 @@ typedef struct {
 typedef struct {
   Registers registers;
   size_t IP;
-  char *code_segment;
+  Byte *code_segment;
   size_t code_size;
-  char *data_segment;
+  Byte *data_segment;
   size_t data_size;
-  char *stack_segment;
+  Byte *stack_segment;
   size_t stack_size;
   char *error_msg;
   unsigned char flags;
+  size_t instructions_count;
 } VM;
 
 int init_vm_from_file(const char *path, VM *vm);
 
 int vm_run(VM *vm);
 
-void vm_print(VM *vm);
+void vm_print(const VM *vm);
 
 void vm_free(VM *vm);
 

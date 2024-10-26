@@ -51,7 +51,7 @@ int init_vm_from_file(const char *path, VM *vm) {
   vm->data_segment = malloc(data_size);
   vm->data_size = data_size;
 
-  if (fread(vm->data_segment, sizeof(char), data_size, file) != data_size) {
+  if (fread(vm->data_segment, sizeof(Byte), data_size, file) != data_size) {
     fprintf(stderr, "Failed to read data segment: '%s'\n", path);
     return 2;
   }
@@ -60,7 +60,7 @@ int init_vm_from_file(const char *path, VM *vm) {
 
   vm->code_segment = malloc(MEMORY_SIZE);
 
-  size_t code_size = fread(vm->code_segment, sizeof(char), MEMORY_SIZE, file);
+  size_t code_size = fread(vm->code_segment, sizeof(Byte), MEMORY_SIZE, file);
 
   if (feof(file)) {
     printf("Successfully loaded file: '%s'\n", path);
@@ -207,7 +207,7 @@ void print_hex(char *data, size_t size) {
   }
 }
 
-void vm_print(VM *vm) {
+void vm_print(const VM *vm) {
   printf("Registers:\n");
   printf("A:  0x%08X\n", vm->registers.A);
   printf("B:  0x%08X\n", vm->registers.B);
