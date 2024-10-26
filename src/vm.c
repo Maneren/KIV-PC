@@ -79,9 +79,10 @@ int init_vm_from_file(const char *path, VM *vm) {
 #define INSTRUCTION(code, handler)                                             \
   case code:                                                                   \
     if (handler(vm)) {                                                         \
-      fprintf(stderr,                                                          \
-              "Error in instruction %02X at address %04lX with reason:\n%s",   \
-              code, vm->IP, vm->error_msg);                                    \
+      fprintf(                                                                 \
+          stderr,                                                              \
+          "Error in instruction 0x%02X at address 0x%08lX with reason:\n%s",   \
+          code, vm->IP, vm->error_msg);                                        \
       return EXIT_FAILURE;                                                     \
     }                                                                          \
     break;
@@ -93,7 +94,8 @@ int vm_run(VM *vm) {
   // NOTE: jump instructions may modify the IP independently of this loop
   for (vm->IP = 0; !halted && vm->IP < vm->code_size; vm->IP++) {
     vm_print(vm);
-    for (size_t i = 0; i < vm->data_size / sizeof(Number); i++) {
+    for (size_t i = 0; i < vm->data_size / sizeof(Number);
+         i += sizeof(Number)) {
       printf("%d ", vm->data_segment[i]);
     }
 
@@ -199,12 +201,12 @@ void print_hex(char *data, size_t size) {
 
 void vm_print(VM *vm) {
   printf("Registers:\n");
-  printf("A:  0x%04X\n", vm->registers.A);
-  printf("B:  0x%04X\n", vm->registers.B);
-  printf("C:  0x%04X\n", vm->registers.C);
-  printf("D:  0x%04X\n", vm->registers.D);
-  printf("S:  0x%04X\n", vm->registers.S);
-  printf("Sp: 0x%04X\n", vm->registers.SP);
+  printf("A:  0x%08X\n", vm->registers.A);
+  printf("B:  0x%08X\n", vm->registers.B);
+  printf("C:  0x%08X\n", vm->registers.C);
+  printf("D:  0x%08X\n", vm->registers.D);
+  printf("S:  0x%08X\n", vm->registers.S);
+  printf("Sp: 0x%08X\n", vm->registers.SP);
   printf("IP: 0x%lX\n", vm->IP);
   printf("Flags: 0b" BYTE_TO_BINARY_PATTERN "\n", BYTE_TO_BINARY(vm->flags));
 

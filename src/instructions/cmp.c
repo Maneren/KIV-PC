@@ -13,8 +13,8 @@ int cmp_flags(Number a, Number b) {
     flags |= FLAG_LT;
   if (a < 0)
     flags |= FLAG_NEG;
-  if (a == 0)
-    flags |= FLAG_ZERO;
+  /* if (a == 0) */
+  /*   flags |= FLAG_ZERO; */
 
   return flags;
 }

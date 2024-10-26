@@ -83,15 +83,15 @@ int vm_stor_reg_im32(VM *vm) {
   Number value;
   PROPAGATE_ERROR(vm_get_reg(vm, reg, &value));
 
-  *(Number *)(vm->data_segment + address) = value;
+  PROPAGATE_ERROR(vm_write_im32(vm, address, value))
 
   return EXIT_SUCCESS;
 }
 
 int vm_stor_reg_reg(VM *vm) {
-  Byte reg_d = vm->code_segment[vm->IP + 1];
-  Byte reg_s = vm->code_segment[vm->IP + 2];
-  vm->IP += sizeof(reg_d) + sizeof(reg_s);
+  Byte reg_s = vm->code_segment[vm->IP + 1];
+  Byte reg_d = vm->code_segment[vm->IP + 2];
+  vm->IP += sizeof(reg_s) + sizeof(reg_d);
 
   DEBUG_PRINT("STOR R%d, R%d\n", reg_d, reg_s);
 
@@ -101,7 +101,7 @@ int vm_stor_reg_reg(VM *vm) {
   Number value;
   PROPAGATE_ERROR(vm_get_reg(vm, reg_s, &value));
 
-  *(Number *)(vm->data_segment + address) = value;
+  PROPAGATE_ERROR(vm_write_im32(vm, address, value))
 
   return EXIT_SUCCESS;
 }

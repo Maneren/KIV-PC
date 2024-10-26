@@ -14,7 +14,7 @@
 
 #define ASSERT(condition)                                                      \
   if (!(condition)) {                                                          \
-    vm->error_msg = ("Assertion failed: " #condition);                         \
+    vm->error_msg = ("Assertion failed: " #condition "\n");                    \
     return 1;                                                                  \
   }
 
