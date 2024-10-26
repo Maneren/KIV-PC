@@ -1,9 +1,9 @@
 CC ?= gcc
-CFLAGS = -Wall -Wextra -pedantic -std=c99 -g3
-BIN = graph.exe
+CFLAGS = -Wall -Wextra -pedantic -std=c99 -g3 -O3
+BIN = kmemu.exe
 
-SRCS=$(wildcard *.c)
-OBJS=$(SRCS:.c=.o)
+SRCS = $(wildcard src/*.c) $(wildcard src/**/*.c)
+OBJS = $(SRCS:.c=.o)
 
 %.o: %.c
 	$(CC) -c $(CFLAGS) $< -o $@
@@ -21,4 +21,4 @@ execute: build
 	./$(BIN) $(ARGS)
 
 valgrind: build
-	valgrind ./$(BIN) $(ARGS) 2>&1 | tee valgrind.log
+	valgrind --leak-check=full --track-origins=yes --show-leak-kinds=all ./$(BIN) $(ARGS) 2>&1 | tee valgrind.log

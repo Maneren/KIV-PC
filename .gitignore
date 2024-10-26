@@ -3,4 +3,5 @@
 *.obj
 *.exe
 *.ps
+vgcore.*
 compile_commands.json
