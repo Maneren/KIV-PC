@@ -13,10 +13,8 @@ typedef unsigned char Byte;
 
 enum {
   FLAG_EQ = 1 << 0,
-  FLAG_ZERO = 1 << 0,
   FLAG_GT = 1 << 1,
   FLAG_LT = 1 << 2,
-  FLAG_NEG = 1 << 3,
 };
 
 typedef struct {

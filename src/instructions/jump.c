@@ -83,7 +83,7 @@ int vm_jge_im32(VM *vm) {
 
   DEBUG_PRINT("JGE 0x%04X\n", address);
 
-  if (vm->flags & (FLAG_GT | FLAG_EQ)) {
+  if (vm->flags | FLAG_GT || vm->flags & FLAG_EQ) {
     size_t target = vm->IP + (size_t)address;
     ASSERT(target < vm->code_size);
     vm->IP = target;
@@ -98,7 +98,7 @@ int vm_jng_im32(VM *vm) {
 
   DEBUG_PRINT("JNG 0x%04X\n", address);
 
-  if (!(vm->flags & FLAG_GT)) {
+  if (vm->flags & FLAG_LT || vm->flags & FLAG_EQ) {
     size_t target = vm->IP + (size_t)address;
     ASSERT(target < vm->code_size);
     vm->IP = target;
@@ -128,7 +128,7 @@ int vm_jle_im32(VM *vm) {
 
   DEBUG_PRINT("JLE 0x%04X\n", address);
 
-  if (vm->flags & (FLAG_LT | FLAG_EQ)) {
+  if (vm->flags & FLAG_LT || vm->flags & FLAG_EQ) {
     size_t target = vm->IP + (size_t)address;
     ASSERT(target < vm->code_size);
     vm->IP = target;
@@ -143,7 +143,7 @@ int vm_jnl_im32(VM *vm) {
 
   DEBUG_PRINT("JNL 0x%04X\n", address);
 
-  if (!(vm->flags & FLAG_LT)) {
+  if (vm->flags & FLAG_GT || vm->flags & FLAG_EQ) {
     size_t target = vm->IP + (size_t)address;
     ASSERT(target < vm->code_size);
     vm->IP = target;

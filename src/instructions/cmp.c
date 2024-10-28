@@ -2,21 +2,8 @@
 #include "common.h"
 #include <stdio.h>
 
-int cmp_flags(Number a, Number b) {
-  int flags = 0;
-
-  if (a == b)
-    flags |= FLAG_EQ;
-  if (a > b)
-    flags |= FLAG_GT;
-  if (a < b)
-    flags |= FLAG_LT;
-  if (a < 0)
-    flags |= FLAG_NEG;
-  /* if (a == 0) */
-  /*   flags |= FLAG_ZERO; */
-
-  return flags;
+unsigned char cmp_flags(Number a, Number b) {
+  return ((a == b) * FLAG_EQ) | ((a < b) * FLAG_LT) | ((a > b) * FLAG_GT);
 }
 
 int vm_cmp_reg_im32(VM *vm) {
