@@ -65,10 +65,10 @@ int vm_inpc_reg(VM *vm) {
 
   DEBUG_PRINT("INPC R%d\n", reg);
 
-  char value;
-  scanf("%c", &value);
+  char ch = getchar();
+  ASSERT(ch != EOF);
 
-  return vm_set_reg(vm, reg, (int)value);
+  return vm_set_reg(vm, reg, (Number)ch);
 }
 
 int vm_inps_reg(VM *vm) {
@@ -80,7 +80,7 @@ int vm_inps_reg(VM *vm) {
   Number address;
   PROPAGATE_ERROR(vm_get_reg(vm, reg, &address));
 
-  for (int ch, i = 0; (ch = getchar()); i++) {
+  for (int ch, i = 0; (ch = getchar()) != '\n'; i++) {
     ASSERT(ch != EOF);
     ASSERT(address >= 0 && (size_t)address + i + sizeof(char) <= vm->data_size);
     vm->data_segment[address + i] = (char)ch;
