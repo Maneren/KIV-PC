@@ -106,8 +106,6 @@ int vm_run(VM *vm) {
 
     Byte instruction = vm->code_segment[vm->IP];
 
-    printf("Instruction: 0x%02x @ 0x%04lX\n", instruction, vm->IP);
-
     vm->IP++;
     vm->instructions_count++;
 
@@ -186,10 +184,13 @@ int vm_run(VM *vm) {
       vm->flags = 0;
   }
 
-  printf("Halt instruction encountered. Halting...\n");
+  if (halted)
+    printf("HALT encountered...\n");
+  else
+    printf("WARNING: Reach EOF without HALT...\n");
 
   printf("Execution time: %.3f seconds (%zu instructions)\n",
-         (double)(clock() - start_time) / CLOCKS_PER_SEC,
+         (float)(clock() - start_time) / CLOCKS_PER_SEC,
          vm->instructions_count);
 
   printf("\nFinal state:\n");
@@ -212,14 +213,18 @@ void print_header(void) {
 }
 
 void print_data_line(size_t index, const Byte *data, size_t size) {
-  printf("%04lX: ", index);
+  printf("%04lX:", index);
   for (size_t j = 0; j < 16; j++) {
     if (j % 4 == 0) {
       printf(" ");
     }
 
-    Byte value = (index + j < size) ? data[index + j] : 0;
-    printf("%02hhX ", value);
+    if (index + j >= size) {
+      printf(" 00");
+      continue;
+    }
+
+    printf(" %02hhX", data[index + j]);
   }
   printf("\n");
 }
@@ -238,15 +243,18 @@ void vm_print(const VM *vm) {
   printf("C:  0x%08X\n", vm->registers.C);
   printf("D:  0x%08X\n", vm->registers.D);
   printf("S:  0x%08X\n", vm->registers.S);
-  printf("Sp: 0x%08X\n", vm->registers.SP);
-  printf("IP: 0x%lX\n", vm->IP);
+  printf("SP: 0x%08X\n", vm->registers.SP);
+  printf("IP: 0x%08lX\n", vm->IP);
   printf("Flags: 0b" BYTE_TO_BINARY_PATTERN "\n", BYTE_TO_BINARY(vm->flags));
 
-  printf("Data segment: (%lu)\n", vm->data_size);
+  printf("Data segment: [0x%lX]\n", vm->data_size);
   pretty_print_data(vm->data_segment, vm->data_size);
   printf("\n");
-  printf("Code segment: (%lu)\n", vm->code_size);
+  printf("Code segment: [0x%lX]\n", vm->code_size);
   pretty_print_data(vm->code_segment, vm->code_size);
+  printf("\n");
+  printf("Stack segment: [0x%lX]\n", vm->stack_size);
+  pretty_print_data(vm->stack_segment, (vm->stack_size / 0x10 + 1) * 0x10);
   printf("\n");
 }
 
