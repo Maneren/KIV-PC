@@ -57,7 +57,7 @@ int init_vm_from_file(const char *input_filepath, const char *output_filepath,
 
   size_t data_size = (size_t)data_size_header;
 
-  vm->data_segment = malloc(data_size);
+  vm->data_segment = calloc(data_size, sizeof(Byte));
   vm->data_size = data_size;
 
   if (fread(vm->data_segment, sizeof(Byte), data_size, input) != data_size) {
@@ -65,7 +65,7 @@ int init_vm_from_file(const char *input_filepath, const char *output_filepath,
     return 2;
   }
 
-  vm->code_segment = malloc(MEMORY_SIZE);
+  vm->code_segment = calloc(MEMORY_SIZE, sizeof(Byte));
 
   size_t code_size = fread(vm->code_segment, sizeof(Byte), MEMORY_SIZE, input);
 
@@ -77,6 +77,8 @@ int init_vm_from_file(const char *input_filepath, const char *output_filepath,
   vm->code_size = code_size;
 
   fclose(input);
+
+  vm->stack_segment = calloc(STACK_SIZE, sizeof(Byte));
 
   return 0;
 }
