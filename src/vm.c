@@ -198,12 +198,17 @@ int vm_run(VM *vm) {
   return 0;
 }
 
-void print_header() {
-  printf("       %02X %02X %02X %02X"
-         "  %02X %02X %02X %02X"
-         "  %02X %02X %02X %02X"
-         "  %02X %02X %02X %02X\n",
-         0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
+void print_header(void) {
+  printf("      ");
+
+  for (int i = 0; i < 16; i++) {
+    if (i % 4 == 0)
+      printf(" ");
+
+    printf("%02X ", i);
+  }
+
+  printf("\n");
 }
 
 void print_data_line(size_t index, const Byte *data, size_t size) {
