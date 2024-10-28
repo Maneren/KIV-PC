@@ -157,6 +157,11 @@ int vm_run(VM *vm) {
       INSTRUCTION(0x78, vm_jle_im32); // JLE im32
       INSTRUCTION(0x79, vm_jnl_im32); // JNL im32
 
+      // CALL INSTRUCTIONS
+      INSTRUCTION(0x80, vm_call_im32); // CALL im32
+      INSTRUCTION(0x81, vm_call_reg);  // CALL reg
+      INSTRUCTION(0x82, vm_ret);       // RET
+
       // IO INSTRUCTIONS
       INSTRUCTION(0xF0, vm_outd_reg); // OUTD reg
       INSTRUCTION(0xF1, vm_outc_reg); // OUTC reg

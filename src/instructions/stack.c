@@ -8,16 +8,10 @@ int vm_push(VM *vm) {
 
   DEBUG_PRINT("PUSH R%d\n", reg);
 
-  vm->registers.SP += sizeof(Number);
-
-  ASSERT(vm->registers.SP >= 0 && (size_t)vm->registers.SP < vm->stack_size);
-
   Number value;
   PROPAGATE_ERROR(vm_get_reg(vm, reg, &value));
 
-  *(Number *)(vm->stack_segment + vm->registers.SP) = value;
-
-  return 0;
+  return vm_push_im32(vm, value);
 }
 
 int vm_pop(VM *vm) {
@@ -26,13 +20,8 @@ int vm_pop(VM *vm) {
 
   DEBUG_PRINT("POP R%d\n", reg);
 
-  ASSERT(vm->registers.SP >= 0 && (size_t)vm->registers.SP < vm->stack_size);
+  Number value;
+  PROPAGATE_ERROR(vm_pop_im32(vm, &value));
 
-  Number value = *(Number *)(vm->stack_segment + vm->registers.SP);
-
-  PROPAGATE_ERROR(vm_set_reg(vm, reg, value));
-
-  vm->registers.SP -= sizeof(Number);
-
-  return 0;
+  return vm_set_reg(vm, reg, value);
 }

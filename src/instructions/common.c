@@ -84,3 +84,18 @@ int vm_write_im32(VM *vm, Number address, Number im32) {
   *(Number *)(vm->data_segment + address) = im32;
   return EXIT_SUCCESS;
 }
+
+int vm_push_im32(VM *vm, Number im32) {
+  Number address = vm->registers.SP;
+  vm->registers.SP += sizeof(Number);
+  ASSERT(address >= 0 && (size_t)address + sizeof(Number) <= vm->stack_size);
+  *(Number *)(vm->stack_segment + vm->registers.SP) = im32;
+  return EXIT_SUCCESS;
+}
+int vm_pop_im32(VM *vm, Number *out) {
+  ASSERT(vm->registers.SP >= 0 &&
+         (size_t)vm->registers.SP + sizeof(Number) <= vm->stack_size);
+  *out = *(Number *)(vm->stack_segment + vm->registers.SP);
+  vm->registers.SP -= sizeof(Number);
+  return EXIT_SUCCESS;
+}

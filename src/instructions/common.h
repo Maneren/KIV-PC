@@ -1,3 +1,6 @@
+#ifndef INCLUDE_INSTRUCTIONS_COMMON_H_
+#define INCLUDE_INSTRUCTIONS_COMMON_H_
+
 #include "../vm.h"
 
 #define PROPAGATE_ERROR(code)                                                  \
@@ -32,3 +35,8 @@ int vm_code_read_im32(VM *vm, Number *out);
 
 int vm_read_im32(VM *vm, Number address, Number *out);
 int vm_write_im32(VM *vm, Number address, Number im32);
+
+int vm_push_im32(VM *vm, Number im32);
+int vm_pop_im32(VM *vm, Number *out);
+
+#endif // INCLUDE_INSTRUCTIONS_COMMON_H_
