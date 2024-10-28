@@ -4,8 +4,7 @@
 
 int vm_push(VM *vm) {
   Byte reg;
-  PROPAGATE_ERROR(vm_code_read_reg(vm, vm->IP + 1, &reg));
-  vm->IP += sizeof(reg);
+  PROPAGATE_ERROR(vm_code_read_reg(vm, &reg));
 
   DEBUG_PRINT("PUSH R%d\n", reg);
 
@@ -23,7 +22,7 @@ int vm_push(VM *vm) {
 
 int vm_pop(VM *vm) {
   Byte reg;
-  vm->IP += sizeof(reg);
+  PROPAGATE_ERROR(vm_code_read_reg(vm, &reg));
 
   DEBUG_PRINT("POP R%d\n", reg);
 

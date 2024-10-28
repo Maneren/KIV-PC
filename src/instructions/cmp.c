@@ -22,9 +22,8 @@ int cmp_flags(Number a, Number b) {
 int vm_cmp_reg_im32(VM *vm) {
   Byte reg;
   Number im32;
-  PROPAGATE_ERROR(vm_code_read_reg(vm, vm->IP + 1, &reg));
-  PROPAGATE_ERROR(vm_code_read_im32(vm, vm->IP + 2, &im32));
-  vm->IP += sizeof(reg) + sizeof(im32);
+  PROPAGATE_ERROR(vm_code_read_reg(vm, &reg));
+  PROPAGATE_ERROR(vm_code_read_im32(vm, &im32));
 
   DEBUG_PRINT("CMP R%d, %d\n", reg, im32);
 
@@ -38,9 +37,8 @@ int vm_cmp_reg_im32(VM *vm) {
 
 int vm_cmp_reg_reg(VM *vm) {
   Byte reg1, reg2;
-  PROPAGATE_ERROR(vm_code_read_reg(vm, vm->IP + 1, &reg1));
-  PROPAGATE_ERROR(vm_code_read_reg(vm, vm->IP + 2, &reg2));
-  vm->IP += sizeof(reg1) + sizeof(reg2);
+  PROPAGATE_ERROR(vm_code_read_reg(vm, &reg1));
+  PROPAGATE_ERROR(vm_code_read_reg(vm, &reg2));
 
   DEBUG_PRINT("CMP R%d, R%d\n", reg1, reg2);
 

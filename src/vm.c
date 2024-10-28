@@ -93,12 +93,15 @@ int vm_run(VM *vm) {
 
   // NOTE: jump instructions may modify the IP independently of this loop
   for (vm->IP = 0, vm->instructions_count = 0;
-       !halted && vm->IP < vm->code_size; vm->IP++, vm->instructions_count++) {
+       !halted && vm->IP < vm->code_size;) {
     vm_print(vm);
 
     Byte instruction = vm->code_segment[vm->IP];
 
     printf("Instruction: 0x%02x @ 0x%04lX\n", instruction, vm->IP);
+
+    vm->IP++;
+    vm->instructions_count++;
 
     switch (instruction) {
     case 0x00: // HALT

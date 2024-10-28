@@ -27,8 +27,8 @@
 int vm_set_reg(VM *vm, Byte reg, Number im32);
 int vm_get_reg(VM *vm, Byte reg, Number *out);
 
-int vm_code_read_reg(VM *vm, size_t ip_offset, Byte *out);
-int vm_code_read_im32(VM *vm, size_t ip_offset, Number *out);
+int vm_code_read_reg(VM *vm, Byte *out);
+int vm_code_read_im32(VM *vm, Number *out);
 
 int vm_read_im32(VM *vm, Number address, Number *out);
 int vm_write_im32(VM *vm, Number address, Number im32);

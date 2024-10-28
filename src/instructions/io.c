@@ -5,8 +5,7 @@
 
 int vm_outd_reg(VM *vm) {
   Byte reg;
-  PROPAGATE_ERROR(vm_code_read_reg(vm, vm->IP + 1, &reg));
-  vm->IP += sizeof(reg);
+  PROPAGATE_ERROR(vm_code_read_reg(vm, &reg));
 
   DEBUG_PRINT("OUTD R%d\n", reg);
 
@@ -20,8 +19,7 @@ int vm_outd_reg(VM *vm) {
 
 int vm_outc_reg(VM *vm) {
   Byte reg;
-  PROPAGATE_ERROR(vm_code_read_reg(vm, vm->IP + 1, &reg));
-  vm->IP += sizeof(reg);
+  PROPAGATE_ERROR(vm_code_read_reg(vm, &reg));
 
   DEBUG_PRINT("OUTC R%d\n", reg);
 
@@ -35,8 +33,7 @@ int vm_outc_reg(VM *vm) {
 
 int vm_outs_reg(VM *vm) {
   Byte reg;
-  PROPAGATE_ERROR(vm_code_read_reg(vm, vm->IP + 1, &reg));
-  vm->IP += sizeof(reg);
+  PROPAGATE_ERROR(vm_code_read_reg(vm, &reg));
 
   DEBUG_PRINT("OUTS R%d\n", reg);
 
@@ -52,8 +49,7 @@ int vm_outs_reg(VM *vm) {
 
 int vm_inpd_reg(VM *vm) {
   Byte reg;
-  PROPAGATE_ERROR(vm_code_read_reg(vm, vm->IP + 1, &reg));
-  vm->IP += sizeof(reg);
+  PROPAGATE_ERROR(vm_code_read_reg(vm, &reg));
 
   DEBUG_PRINT("INPD R%d\n", reg);
 
@@ -65,8 +61,7 @@ int vm_inpd_reg(VM *vm) {
 
 int vm_inpc_reg(VM *vm) {
   Byte reg;
-  PROPAGATE_ERROR(vm_code_read_reg(vm, vm->IP + 1, &reg));
-  vm->IP += sizeof(reg);
+  PROPAGATE_ERROR(vm_code_read_reg(vm, &reg));
 
   DEBUG_PRINT("INPC R%d\n", reg);
 
@@ -78,8 +73,7 @@ int vm_inpc_reg(VM *vm) {
 
 int vm_inps_reg(VM *vm) {
   Byte reg;
-  PROPAGATE_ERROR(vm_code_read_reg(vm, vm->IP + 1, &reg));
-  vm->IP += sizeof(reg);
+  PROPAGATE_ERROR(vm_code_read_reg(vm, &reg));
 
   DEBUG_PRINT("INPS R%d\n", reg);
 

@@ -1,4 +1,5 @@
 #include "common.h"
+#include <stddef.h>
 #include <stdlib.h>
 
 int vm_set_reg(VM *vm, Byte reg, Number im32) {
@@ -57,15 +58,19 @@ int vm_get_reg(VM *vm, Byte reg, Number *out) {
   return EXIT_SUCCESS;
 }
 
-int vm_code_read_reg(VM *vm, size_t address, Byte *out) {
+int vm_code_read_reg(VM *vm, Byte *out) {
+  size_t address = vm->IP;
   ASSERT(address + sizeof(Byte) <= vm->code_size);
   *out = vm->code_segment[address];
+  vm->IP += sizeof(Byte);
   return EXIT_SUCCESS;
 }
 
-int vm_code_read_im32(VM *vm, size_t address, Number *out) {
+int vm_code_read_im32(VM *vm, Number *out) {
+  size_t address = vm->IP;
   ASSERT(address + sizeof(Number) <= vm->code_size);
   *(out) = *(Number *)(vm->code_segment + address);
+  vm->IP += sizeof(Number);
   return EXIT_SUCCESS;
 }
 
