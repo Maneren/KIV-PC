@@ -2,6 +2,7 @@
 #define INCLUDE_SEMESTRALKA_VM_H_
 
 #include <stddef.h>
+#include <stdio.h>
 
 #define MEMORY_SIZE 256 * 1024
 #define STACK_SIZE 16 * 1024
@@ -36,11 +37,13 @@ typedef struct {
   Byte *stack_segment;
   size_t stack_size;
   char *error_msg;
+  FILE *output;
   unsigned char flags;
   size_t instructions_count;
 } VM;
 
-int init_vm_from_file(const char *path, VM *vm);
+int init_vm_from_file(const char *input_filepath, const char *output_filepath,
+                      VM *vm);
 
 int vm_run(VM *vm);
 

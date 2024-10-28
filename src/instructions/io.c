@@ -12,7 +12,7 @@ int vm_outd_reg(VM *vm) {
   Number value;
   PROPAGATE_ERROR(vm_get_reg(vm, reg, &value));
 
-  printf("%d\n", value);
+  fprintf(vm->output, "%d\n", value);
 
   return EXIT_SUCCESS;
 }
@@ -26,7 +26,7 @@ int vm_outc_reg(VM *vm) {
   Number value;
   PROPAGATE_ERROR(vm_get_reg(vm, reg, &value));
 
-  printf("%c\n", value);
+  fprintf(vm->output, "%c\n", value);
 
   return EXIT_SUCCESS;
 }
@@ -42,7 +42,7 @@ int vm_outs_reg(VM *vm) {
 
   ASSERT(address >= 0 && (size_t)address < vm->data_size);
 
-  printf("%s\n", (const char *)vm->code_segment + address);
+  fprintf(vm->output, "%s\n", (const char *)vm->code_segment + address);
 
   return EXIT_SUCCESS;
 }

@@ -5,11 +5,21 @@
 #define size_t unsigned int
 
 int main(int argc, char *argv[]) {
-  char *filename = "sample/bubble.kmx";
+  if (argc <= 1) {
+    fprintf(stderr, "Usage: %s <program.kmx> [<output[.txt]>]\n", argv[0]);
+    return EXIT_FAILURE;
+  }
+
+  char *filename = argv[1];
+
+  char *output_file = NULL;
+  if (argc > 2) {
+    output_file = argv[2];
+  }
 
   VM vm = {0};
 
-  if (init_vm_from_file(filename, &vm) != EXIT_SUCCESS) {
+  if (init_vm_from_file(filename, output_file, &vm) != EXIT_SUCCESS) {
     fprintf(stderr, "Failed to initialize VM\n");
     return EXIT_FAILURE;
   }

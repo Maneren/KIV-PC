@@ -15,33 +15,43 @@
 const char KMX_HEADER[3] = "KMX";
 const size_t KMX_HEADER_SIZE = 3;
 
-int init_vm_from_file(const char *path, VM *vm) {
-  fprintf(stderr, "Opening file: '%s'\n", path);
+int init_vm_from_file(const char *input_filepath, const char *output_filepath,
+                      VM *vm) {
+  FILE *input = fopen(input_filepath, "r");
 
-  FILE *file = fopen(path, "r");
+  if (!input) {
+    fprintf(stderr, "Failed to open file: '%s'\n", input_filepath);
+    return 1;
+  }
 
-  if (!file) {
-    fprintf(stderr, "Failed to open file: '%s'\n", path);
-    return 2;
+  if (output_filepath) {
+    vm->output = fopen(output_filepath, "w");
+
+    if (!vm->output) {
+      fprintf(stderr, "Failed to open output file: '%s'\n", output_filepath);
+      return 1;
+    }
+  } else {
+    vm->output = stdout;
   }
 
   char header[KMX_HEADER_SIZE + 1];
   header[KMX_HEADER_SIZE] = '\0';
 
-  if (fread(header, sizeof(char), KMX_HEADER_SIZE, file) != KMX_HEADER_SIZE) {
-    fprintf(stderr, "Failed to read header: '%s'\n", path);
+  if (fread(header, sizeof(char), KMX_HEADER_SIZE, input) != KMX_HEADER_SIZE) {
+    fprintf(stderr, "Failed to read header: '%s'\n", input_filepath);
     return 2;
   }
 
   if (strncmp(header, KMX_HEADER, 3) != 0) {
-    fprintf(stderr, "Invalid KMX file header: '%s'\n", path);
+    fprintf(stderr, "Invalid KMX file header: '%s'\n", input_filepath);
     return 2;
   }
 
   int data_size_header = 0;
 
-  if (fread(&data_size_header, sizeof(int), 1, file) != 1) {
-    fprintf(stderr, "Failed to read data size: '%s'\n", path);
+  if (fread(&data_size_header, sizeof(int), 1, input) != 1) {
+    fprintf(stderr, "Failed to read data size: '%s'\n", input_filepath);
     return 2;
   }
 
@@ -50,27 +60,23 @@ int init_vm_from_file(const char *path, VM *vm) {
   vm->data_segment = malloc(data_size);
   vm->data_size = data_size;
 
-  if (fread(vm->data_segment, sizeof(Byte), data_size, file) != data_size) {
-    fprintf(stderr, "Failed to read data segment: '%s'\n", path);
+  if (fread(vm->data_segment, sizeof(Byte), data_size, input) != data_size) {
+    fprintf(stderr, "Failed to read data segment: '%s'\n", input_filepath);
     return 2;
   }
 
-  printf("Data segment size: %lu\n", data_size);
-
   vm->code_segment = malloc(MEMORY_SIZE);
 
-  size_t code_size = fread(vm->code_segment, sizeof(Byte), MEMORY_SIZE, file);
+  size_t code_size = fread(vm->code_segment, sizeof(Byte), MEMORY_SIZE, input);
 
-  if (feof(file)) {
-    printf("Successfully loaded file: '%s'\n", path);
-  } else {
-    fprintf(stderr, "Failed to read code segment: '%s'\n", path);
+  if (!feof(input)) {
+    fprintf(stderr, "Failed to read code segment: '%s'\n", input_filepath);
     return 2;
   }
 
   vm->code_size = code_size;
 
-  fclose(file);
+  fclose(input);
 
   return 0;
 }
@@ -240,4 +246,5 @@ void vm_print(const VM *vm) {
 void vm_free(VM *vm) {
   free(vm->data_segment);
   free(vm->code_segment);
+  fclose(vm->output);
 }
