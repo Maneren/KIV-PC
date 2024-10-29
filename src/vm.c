@@ -92,7 +92,7 @@ int init_vm_from_file(const char *input_filepath, const char *output_filepath,
           code, vm->IP, vm->error_msg);                                        \
       return EXIT_FAILURE;                                                     \
     }                                                                          \
-    break;
+    break
 
 int vm_run(VM *vm) {
 

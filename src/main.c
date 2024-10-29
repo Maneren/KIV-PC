@@ -10,9 +10,9 @@ int main(int argc, char *argv[]) {
     return EXIT_FAILURE;
   }
 
-  char *filename = argv[1];
+  char const *filename = argv[1];
 
-  char *output_file = NULL;
+  char const *output_file = NULL;
   if (argc > 2) {
     output_file = argv[2];
   }

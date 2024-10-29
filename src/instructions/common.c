@@ -69,7 +69,7 @@ int vm_code_read_reg(VM *vm, Byte *out) {
 int vm_code_read_im32(VM *vm, Number *out) {
   size_t address = vm->IP;
   ASSERT(address + sizeof(Number) <= vm->code_size);
-  *(out) = *(Number *)(vm->code_segment + address);
+  *out = *(Number *)(vm->code_segment + address);
   vm->IP += sizeof(Number);
   return EXIT_SUCCESS;
 }

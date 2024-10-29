@@ -65,10 +65,10 @@ int vm_inpc_reg(VM *vm) {
 
   DEBUG_PRINT("INPC R%d\n", reg);
 
-  char ch = getchar();
+  int ch = getchar();
   ASSERT(ch != EOF);
 
-  return vm_set_reg(vm, reg, (Number)ch);
+  return vm_set_reg(vm, reg, ch & 0xFF);
 }
 
 int vm_inps_reg(VM *vm) {

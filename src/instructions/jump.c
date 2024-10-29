@@ -83,7 +83,7 @@ int vm_jge_im32(VM *vm) {
 
   DEBUG_PRINT("JGE 0x%04X\n", address);
 
-  if (vm->flags | FLAG_GT || vm->flags & FLAG_EQ) {
+  if (vm->flags & FLAG_GT || vm->flags & FLAG_EQ) {
     size_t target = vm->IP + (size_t)address;
     ASSERT(target < vm->code_size);
     vm->IP = target;
