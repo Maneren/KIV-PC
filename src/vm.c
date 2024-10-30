@@ -117,7 +117,8 @@ int vm_run(VM *vm) {
     instruction_handler_t handler = instruction_table[instruction];
 
     if (!handler) {
-      fprintf(stderr, "Unknown instruction at address 0x%08lX\n", vm->IP);
+      fprintf(stderr, "Unknown instruction 0x%02X at address 0x%08lX\n",
+              instruction, vm->IP);
       return EXIT_FAILURE;
     }
 
