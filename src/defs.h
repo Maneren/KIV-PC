@@ -15,5 +15,5 @@
     exit(EXIT_MEMORY);                                                         \
   }
 
-#define SAFE_FREE(x) ((x && *x) ? free(*x) : 0, *(x) = NULL)
 // Free the pointer only if it isn't NULL and then set it to NULL
+#define SAFE_FREE(x) ((x && *x) ? free(*x) : (void)0, *(x) = NULL)

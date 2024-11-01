@@ -2,12 +2,13 @@
 #define INCLUDE_INSTRUCTIONS_COMMON_H_
 
 #include "../vm.h"
+#include <stdlib.h>
 
 // Run the code and return if it returns unsuccessful erorr code
 #define PROPAGATE_ERROR(code)                                                  \
   {                                                                            \
-    int status;                                                                \
-    if ((status = (code)) != EXIT_SUCCESS)                                     \
+    int status = (code);                                                       \
+    if (status != EXIT_SUCCESS)                                                \
       return status;                                                           \
   }
 

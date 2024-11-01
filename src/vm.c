@@ -121,9 +121,7 @@ int vm_run(VM *vm) {
     instruction_handler_t handler = instruction_table[instruction];
 
     if (!handler) {
-      char *msg;
-      SAFE_ALLOCATE(msg, VM_ERROR_BUFFER_SIZE, sizeof(char));
-      snprintf(msg, VM_ERROR_BUFFER_SIZE,
+      snprintf(vm->error_msg, VM_ERROR_BUFFER_SIZE,
                "Unknown instruction 0x%02X at address 0x%08lX\n", instruction,
                vm->IP);
 
@@ -131,9 +129,6 @@ int vm_run(VM *vm) {
     }
 
     PROPAGATE_ERROR(handler(vm));
-
-    if (instruction != 0x60 && instruction != 0x61)
-      vm->flags = 0;
   }
 
   if (!halted) {
