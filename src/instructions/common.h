@@ -10,22 +10,16 @@
       return status;                                                           \
   }
 
-// #define PROPAGATE(code)                                                        \
-//   code;                                                                        \
-//   if (vm->error_msg)                                                           \
-//     return 1;
-
-#define ASSERT(condition)                                                      \
+#define ASSERT(condition, msg, ...)                                            \
   if (!(condition)) {                                                          \
-    vm->error_msg = ("Assertion failed: " #condition "\n");                    \
+    vm->error_msg = snprintf(vm->error_msg, VM_ERROR_BUFFER_SIZE,              \
+                             "Assertion failed: " #msg "\n", __VA_ARGS__);     \
     return 1;                                                                  \
   }
 
-#ifdef INSTRUCTIONS_DEBUG
-#define DEBUG_PRINT(...) printf(__VA_ARGS__)
-#else
-#define DEBUG_PRINT(...)
-#endif
+#define DEBUG_PRINT(...)                                                       \
+  if (vm->debug)                                                               \
+  printf(__VA_ARGS__)
 
 int vm_set_reg(VM *vm, Byte reg, Number im32);
 int vm_get_reg(VM *vm, Byte reg, Number *out);

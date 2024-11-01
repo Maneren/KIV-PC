@@ -24,8 +24,23 @@ int main(int argc, char *argv[]) {
     return EXIT_FAILURE;
   }
 
+  const char *debug_envvar = getenv("DEBUG");
+  char debug_level = 0;
+  if (debug_envvar) {
+    debug_level = debug_envvar[0];
+
+    if (debug_level < '0' || debug_level > '2') {
+      fprintf(stderr, "Invalid debug level\n");
+      return EXIT_FAILURE;
+    }
+
+    vm.debug = debug_level - '0';
+  }
+
   if (vm_run(&vm)) {
     fprintf(stderr, "Failed to run VM\n");
+    if (vm.error_msg)
+      fprintf(stderr, "Reason: %s\n", vm.error_msg);
   }
 
   fflush(stdout);

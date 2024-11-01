@@ -7,7 +7,7 @@
 #define MEMORY_SIZE 256 * 1024
 #define STACK_SIZE 16 * 1024
 
-#define INSTRUCTIONS_DEBUG
+#define VM_ERROR_BUFFER_SIZE 256
 
 typedef signed int Number;
 typedef unsigned char Byte;
@@ -40,6 +40,7 @@ typedef struct {
   FILE *output;
   unsigned char flags;
   size_t instructions_count;
+  unsigned char debug;
 } VM;
 
 int init_vm_from_file(const char *input_filepath, const char *output_filepath,

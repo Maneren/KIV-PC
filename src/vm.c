@@ -1,5 +1,7 @@
 #include "vm.h"
+#include "defs.h"
 #include "instructions/all.h"
+#include "instructions/common.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -21,7 +23,7 @@ int init_vm_from_file(const char *input_filepath, const char *output_filepath,
 
   if (!input) {
     fprintf(stderr, "Failed to open file: '%s'\n", input_filepath);
-    return 1;
+    exit(EXIT_ARGS);
   }
 
   if (output_filepath) {
@@ -29,7 +31,7 @@ int init_vm_from_file(const char *input_filepath, const char *output_filepath,
 
     if (!vm->output) {
       fprintf(stderr, "Failed to open output file: '%s'\n", output_filepath);
-      return 1;
+      exit(EXIT_ARGS);
     }
   } else {
     vm->output = stdout;
@@ -40,45 +42,46 @@ int init_vm_from_file(const char *input_filepath, const char *output_filepath,
 
   if (fread(header, sizeof(char), KMX_HEADER_SIZE, input) != KMX_HEADER_SIZE) {
     fprintf(stderr, "Failed to read header: '%s'\n", input_filepath);
-    return 2;
+    exit(EXIT_FILE);
   }
 
   if (strncmp(header, KMX_HEADER, 3) != 0) {
     fprintf(stderr, "Invalid KMX file header: '%s'\n", input_filepath);
-    return 2;
+    exit(EXIT_FILE);
   }
 
   int data_size_header = 0;
 
   if (fread(&data_size_header, sizeof(int), 1, input) != 1) {
     fprintf(stderr, "Failed to read data size: '%s'\n", input_filepath);
-    return 2;
+    exit(EXIT_FILE);
   }
 
   size_t data_size = (size_t)data_size_header;
 
-  vm->data_segment = calloc(data_size, sizeof(Byte));
+  SAFE_ALLOCATE(vm->data_segment, data_size, sizeof(Byte));
   vm->data_size = data_size;
 
   if (fread(vm->data_segment, sizeof(Byte), data_size, input) != data_size) {
     fprintf(stderr, "Failed to read data segment: '%s'\n", input_filepath);
-    return 2;
+    exit(EXIT_FILE);
   }
 
-  vm->code_segment = calloc(MEMORY_SIZE, sizeof(Byte));
+  SAFE_ALLOCATE(vm->code_segment, MEMORY_SIZE, sizeof(Byte));
 
   size_t code_size = fread(vm->code_segment, sizeof(Byte), MEMORY_SIZE, input);
 
   if (!feof(input)) {
     fprintf(stderr, "Failed to read code segment: '%s'\n", input_filepath);
-    return 2;
+    exit(EXIT_FILE);
   }
 
   vm->code_size = code_size;
 
   fclose(input);
 
-  vm->stack_segment = calloc(STACK_SIZE, sizeof(Byte));
+  SAFE_ALLOCATE(vm->stack_segment, STACK_SIZE, sizeof(Byte));
+  SAFE_ALLOCATE(vm->error_msg, VM_ERROR_BUFFER_SIZE, sizeof(char));
 
   return 0;
 }
@@ -102,7 +105,8 @@ int vm_run(VM *vm) {
   // NOTE: jump instructions may modify the IP independently of this loop
   for (vm->IP = 0, vm->instructions_count = 0;
        !halted && vm->IP < vm->code_size;) {
-    vm_print(vm);
+    if (vm->debug > 1)
+      vm_print(vm);
 
     Byte instruction = vm->code_segment[vm->IP];
 
@@ -117,9 +121,13 @@ int vm_run(VM *vm) {
     instruction_handler_t handler = instruction_table[instruction];
 
     if (!handler) {
-      fprintf(stderr, "Unknown instruction 0x%02X at address 0x%08lX\n",
-              instruction, vm->IP);
-      return EXIT_FAILURE;
+      char *msg;
+      SAFE_ALLOCATE(msg, VM_ERROR_BUFFER_SIZE, sizeof(char));
+      snprintf(msg, VM_ERROR_BUFFER_SIZE,
+               "Unknown instruction 0x%02X at address 0x%08lX\n", instruction,
+               vm->IP);
+
+      return EXIT_UNKNOWN;
     }
 
     if (handler(vm))
@@ -129,19 +137,21 @@ int vm_run(VM *vm) {
       vm->flags = 0;
   }
 
-  if (halted)
-    printf("HALT encountered...\n");
-  else
+  if (!halted) {
     printf("WARNING: Reach EOF without HALT...\n");
+  } else {
+    DEBUG_PRINT("HALT encountered...\n");
+  }
 
-  printf("Execution time: %.3f seconds (%zu instructions)\n",
-         (float)(clock() - start_time) / CLOCKS_PER_SEC,
-         vm->instructions_count);
+  if (vm->debug) {
+    printf("Execution time: %.3f seconds (%zu instructions)\n",
+           (float)(clock() - start_time) / CLOCKS_PER_SEC,
+           vm->instructions_count);
+    printf("\nFinal state:\n");
+    vm_print(vm);
+  }
 
-  printf("\nFinal state:\n");
-  vm_print(vm);
-
-  return 0;
+  return EXIT_SUCCESS;
 }
 
 void print_header(void) {
@@ -204,7 +214,13 @@ void vm_print(const VM *vm) {
 }
 
 void vm_free(VM *vm) {
-  free(vm->data_segment);
-  free(vm->code_segment);
-  fclose(vm->output);
+  SAFE_FREE(&vm->data_segment);
+  SAFE_FREE(&vm->code_segment);
+  SAFE_FREE(&vm->stack_segment);
+  if (vm->error_msg) {
+    SAFE_FREE(&vm->error_msg);
+  }
+  if (vm->output) {
+    fclose(vm->output);
+  }
 }
