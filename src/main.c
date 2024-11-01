@@ -38,12 +38,13 @@ int main(int argc, char *argv[]) {
   }
 
   if (vm_run(&vm)) {
+    fflush(stdout);
+
     fprintf(stderr, "Failed to run VM\n");
     if (vm.error_msg)
       fprintf(stderr, "Reason: %s\n", vm.error_msg);
   }
 
-  fflush(stdout);
   fflush(stderr);
 
   vm_free(&vm);
