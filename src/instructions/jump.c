@@ -9,7 +9,8 @@ int vm_jmp_im32(VM *vm) {
 
   DEBUG_PRINT("JMP 0x%04X\n", address);
 
-  ASSERT(address >= 0 && (size_t)address < vm->code_size);
+  ASSERT(address >= 0 && (size_t)address < vm->code_size,
+         "Relative jump to invalid address 0x%08X", address);
 
   vm->IP = address;
 
@@ -25,7 +26,8 @@ int vm_jmp_reg(VM *vm) {
   Number address;
   PROPAGATE_ERROR(vm_get_reg(vm, reg, &address));
 
-  ASSERT(address >= 0 && (size_t)address < vm->code_size);
+  ASSERT(address >= 0 && (size_t)address < vm->code_size,
+         "Relative jump to invalid address 0x%08X", address);
 
   vm->IP = address;
 
@@ -40,7 +42,8 @@ int vm_je_im32(VM *vm) {
 
   if (vm->flags & FLAG_EQ) {
     size_t target = vm->IP + (size_t)address;
-    ASSERT(target < vm->code_size);
+    ASSERT(target < vm->code_size,
+           "Jump to address 0x%08lX outside code segment", target);
     vm->IP = target;
   }
 
@@ -55,7 +58,8 @@ int vm_jne_im32(VM *vm) {
 
   if (!(vm->flags & FLAG_EQ)) {
     size_t target = vm->IP + (size_t)address;
-    ASSERT(target < vm->code_size);
+    ASSERT(target < vm->code_size,
+           "Jump to address 0x%08lX outside code segment", target);
     vm->IP = target;
   }
 
@@ -70,7 +74,8 @@ int vm_jg_im32(VM *vm) {
 
   if (vm->flags & FLAG_GT) {
     size_t target = vm->IP + (size_t)address;
-    ASSERT(target < vm->code_size);
+    ASSERT(target < vm->code_size,
+           "Jump to address 0x%08lX outside code segment", target);
     vm->IP = target;
   }
 
@@ -85,7 +90,8 @@ int vm_jge_im32(VM *vm) {
 
   if (vm->flags & FLAG_GT || vm->flags & FLAG_EQ) {
     size_t target = vm->IP + (size_t)address;
-    ASSERT(target < vm->code_size);
+    ASSERT(target < vm->code_size,
+           "Jump to address 0x%08lX outside code segment", target);
     vm->IP = target;
   }
 
@@ -100,7 +106,8 @@ int vm_jng_im32(VM *vm) {
 
   if (vm->flags & FLAG_LT || vm->flags & FLAG_EQ) {
     size_t target = vm->IP + (size_t)address;
-    ASSERT(target < vm->code_size);
+    ASSERT(target < vm->code_size,
+           "Jump to address 0x%08lX outside code segment", target);
     vm->IP = target;
   }
 
@@ -115,7 +122,8 @@ int vm_jl_im32(VM *vm) {
 
   if (vm->flags & FLAG_LT) {
     size_t target = vm->IP + (size_t)address;
-    ASSERT(target < vm->code_size);
+    ASSERT(target < vm->code_size,
+           "Jump to address 0x%08lX outside code segment", target);
     vm->IP = target;
   }
 
@@ -130,7 +138,8 @@ int vm_jle_im32(VM *vm) {
 
   if (vm->flags & FLAG_LT || vm->flags & FLAG_EQ) {
     size_t target = vm->IP + (size_t)address;
-    ASSERT(target < vm->code_size);
+    ASSERT(target < vm->code_size,
+           "Jump to address 0x%08lX outside code segment", target);
     vm->IP = target;
   }
 
@@ -145,7 +154,8 @@ int vm_jnl_im32(VM *vm) {
 
   if (vm->flags & FLAG_GT || vm->flags & FLAG_EQ) {
     size_t target = vm->IP + (size_t)address;
-    ASSERT(target < vm->code_size);
+    ASSERT(target < vm->code_size,
+           "Jump to address 0x%08lX outside code segment", target);
     vm->IP = target;
   }
 

@@ -98,7 +98,7 @@ int vm_div_reg_im32(VM *vm) {
 
   DEBUG_PRINT("DIV R%d, %d\n", reg, im32);
 
-  ASSERT(im32 != 0);
+  ASSERT(im32 != 0, "Can't divide by zero");
 
   Number value;
   PROPAGATE_ERROR(vm_get_reg(vm, reg, &value));
@@ -117,7 +117,7 @@ int vm_div_reg_reg(VM *vm) {
   PROPAGATE_ERROR(vm_get_reg(vm, reg_d, &value1));
   PROPAGATE_ERROR(vm_get_reg(vm, reg_s, &value2));
 
-  ASSERT(value2 != 0);
+  ASSERT(value2 != 0, "Can't divide by zero");
 
   return vm_set_reg(vm, reg_d, value1 / value2);
 }

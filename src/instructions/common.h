@@ -10,10 +10,9 @@
       return status;                                                           \
   }
 
-#define ASSERT(condition, msg, ...)                                            \
+#define ASSERT(condition, ...)                                                 \
   if (!(condition)) {                                                          \
-    vm->error_msg = snprintf(vm->error_msg, VM_ERROR_BUFFER_SIZE,              \
-                             "Assertion failed: " #msg "\n", __VA_ARGS__);     \
+    snprintf(vm->error_msg, VM_ERROR_BUFFER_SIZE, __VA_ARGS__);                \
     return 1;                                                                  \
   }
 

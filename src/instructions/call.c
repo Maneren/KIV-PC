@@ -8,7 +8,8 @@ int vm_call_im32(VM *vm) {
 
   DEBUG_PRINT("CALL %08X\n", address);
 
-  ASSERT(address >= 0 && (size_t)address < vm->code_size);
+  ASSERT(address >= 0 && (size_t)address < vm->code_size,
+         "Call to invalid address 0x%08X", address);
 
   PROPAGATE_ERROR(vm_push_im32(vm, (Number)vm->IP));
 
@@ -26,7 +27,8 @@ int vm_call_reg(VM *vm) {
 
   DEBUG_PRINT("CALL R%d\n", reg);
 
-  ASSERT(address >= 0 && (size_t)address < vm->code_size);
+  ASSERT(address >= 0 && (size_t)address < vm->code_size,
+         "Call to invalid address 0x%08X", address);
 
   PROPAGATE_ERROR(vm_push_im32(vm, (Number)vm->IP));
 
@@ -41,7 +43,8 @@ int vm_ret(VM *vm) {
   Number address;
   PROPAGATE_ERROR(vm_pop_im32(vm, &address));
 
-  ASSERT(address >= 0 && (size_t)address < vm->code_size);
+  ASSERT(address >= 0 && (size_t)address < vm->code_size,
+         "Return to invalid address 0x%08X", address);
 
   vm->IP = address;
 
