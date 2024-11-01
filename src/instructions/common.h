@@ -6,14 +6,14 @@
 #define PROPAGATE_ERROR(code)                                                  \
   {                                                                            \
     int status;                                                                \
-    if ((status = (code)))                                                     \
+    if ((status = (code)) != EXIT_SUCCESS)                                     \
       return status;                                                           \
   }
 
 #define ASSERT(condition, ...)                                                 \
   if (!(condition)) {                                                          \
     snprintf(vm->error_msg, VM_ERROR_BUFFER_SIZE, __VA_ARGS__);                \
-    return 1;                                                                  \
+    return EXIT_FAILURE;                                                       \
   }
 
 #define DEBUG_PRINT(...)                                                       \

@@ -1,3 +1,4 @@
+#include "defs.h"
 #include "vm.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -7,7 +8,7 @@
 int main(int argc, char *argv[]) {
   if (argc <= 1) {
     fprintf(stderr, "Usage: %s ⟨program.kmx⟩ [⟨output[.txt]⟩]\n", argv[0]);
-    return EXIT_FAILURE;
+    return EXIT_ARGS;
   }
 
   char const *filename = argv[1];
@@ -19,9 +20,12 @@ int main(int argc, char *argv[]) {
 
   VM vm = {0};
 
-  if (init_vm_from_file(filename, output_file, &vm) != EXIT_SUCCESS) {
+  int status = init_vm_from_file(filename, output_file, &vm);
+
+  if (status != EXIT_SUCCESS) {
     fprintf(stderr, "Failed to initialize VM\n");
-    return EXIT_FAILURE;
+    vm_free(&vm);
+    return status;
   }
 
   const char *debug_envvar = getenv("DEBUG");
@@ -31,21 +35,22 @@ int main(int argc, char *argv[]) {
 
     if (debug_level < '0' || debug_level > '2') {
       fprintf(stderr, "Invalid debug level\n");
-      return EXIT_FAILURE;
+      vm_free(&vm);
+      return EXIT_ARGS;
     }
 
     vm.debug = debug_level - '0';
   }
 
-  if (vm_run(&vm)) {
+  status = vm_run(&vm);
+
+  if (status != EXIT_SUCCESS) {
     fflush(stdout);
 
-    fprintf(stderr, "Failed to run VM\n");
+    fprintf(stderr, "Program execution failed\n");
     if (vm.error_msg)
       fprintf(stderr, "Reason: %s\n", vm.error_msg);
   }
-
-  fflush(stderr);
 
   vm_free(&vm);
 

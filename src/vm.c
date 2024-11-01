@@ -23,7 +23,7 @@ int init_vm_from_file(const char *input_filepath, const char *output_filepath,
 
   if (!input) {
     fprintf(stderr, "Failed to open file: '%s'\n", input_filepath);
-    exit(EXIT_ARGS);
+    return EXIT_ARGS;
   }
 
   if (output_filepath) {
@@ -31,7 +31,7 @@ int init_vm_from_file(const char *input_filepath, const char *output_filepath,
 
     if (!vm->output) {
       fprintf(stderr, "Failed to open output file: '%s'\n", output_filepath);
-      exit(EXIT_ARGS);
+      return EXIT_ARGS;
     }
   } else {
     vm->output = stdout;
@@ -42,19 +42,19 @@ int init_vm_from_file(const char *input_filepath, const char *output_filepath,
 
   if (fread(header, sizeof(char), KMX_HEADER_SIZE, input) != KMX_HEADER_SIZE) {
     fprintf(stderr, "Failed to read header: '%s'\n", input_filepath);
-    exit(EXIT_FILE);
+    return EXIT_FILE;
   }
 
   if (strncmp(header, KMX_HEADER, KMX_HEADER_SIZE) != 0) {
     fprintf(stderr, "Invalid KMX file header: '%s'\n", input_filepath);
-    exit(EXIT_FILE);
+    return EXIT_FILE;
   }
 
   int data_size_header = 0;
 
   if (fread(&data_size_header, sizeof(int), 1, input) != 1) {
     fprintf(stderr, "Failed to read data size: '%s'\n", input_filepath);
-    exit(EXIT_FILE);
+    return EXIT_FILE;
   }
 
   size_t data_size = (size_t)data_size_header;
@@ -64,7 +64,7 @@ int init_vm_from_file(const char *input_filepath, const char *output_filepath,
 
   if (fread(vm->data_segment, sizeof(Byte), data_size, input) != data_size) {
     fprintf(stderr, "Failed to read data segment: '%s'\n", input_filepath);
-    exit(EXIT_FILE);
+    return EXIT_FILE;
   }
 
   SAFE_ALLOCATE(vm->code_segment, MEMORY_SIZE, sizeof(Byte));
@@ -73,7 +73,7 @@ int init_vm_from_file(const char *input_filepath, const char *output_filepath,
 
   if (!feof(input)) {
     fprintf(stderr, "Failed to read code segment: '%s'\n", input_filepath);
-    exit(EXIT_FILE);
+    return EXIT_FILE;
   }
 
   vm->code_size = code_size;
@@ -85,17 +85,6 @@ int init_vm_from_file(const char *input_filepath, const char *output_filepath,
 
   return 0;
 }
-
-#define INSTRUCTION(code, handler)                                             \
-  case code:                                                                   \
-    if (handler(vm)) {                                                         \
-      fprintf(                                                                 \
-          stderr,                                                              \
-          "Error in instruction 0x%02X at address 0x%08lX with reason:\n%s",   \
-          code, vm->IP, vm->error_msg);                                        \
-      return EXIT_FAILURE;                                                     \
-    }                                                                          \
-    break
 
 int vm_run(VM *vm) {
 
@@ -130,8 +119,7 @@ int vm_run(VM *vm) {
       return EXIT_UNKNOWN;
     }
 
-    if (handler(vm))
-      return EXIT_FAILURE;
+    PROPAGATE_ERROR(handler(vm));
 
     if (instruction != 0x60 && instruction != 0x61)
       vm->flags = 0;

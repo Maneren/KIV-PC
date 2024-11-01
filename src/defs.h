@@ -15,4 +15,4 @@
     exit(EXIT_MEMORY);                                                         \
   }
 
-#define SAFE_FREE(x) (free(*x), *(x) = NULL)
+#define SAFE_FREE(x) ((x && *x) ? free(*x) : 0, *(x) = NULL)
