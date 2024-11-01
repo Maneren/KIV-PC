@@ -28,7 +28,7 @@
 @L01:
         DEC     C
         ADD     S, 4
-        ADD     D, 4		
+        ADD     D, 4	
         CMP     C, 0
         JG      @LBubbleForBeg
 @LBubbleForEnd:
@@ -41,8 +41,9 @@
 @LOutputForBeg:
         LOAD    A, S
         OUTD    A
+        ADD     S, 4
         DEC     C
         CMP     C, 0
         JG      @LOutputForBeg
 @LOutputForEnd:
-        STOP
+        HALT
