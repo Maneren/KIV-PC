@@ -1,5 +1,4 @@
 #include "arithemtic.h"
-#include "bit.h"
 #include "call.h"
 #include "cmp.h"
 #include "data.h"
@@ -13,7 +12,7 @@ int vm_nop(VM *_) { return 0; }
 
 typedef int (*instruction_handler_t)(VM *vm);
 
-instruction_handler_t instruction_table[256] = {
+static instruction_handler_t instruction_table[256] = {
     // Data instructions
     [0x10] = vm_mov_reg_im32,  // MOV reg, im32
     [0x11] = vm_mov_reg_reg,   // MOV regd, regs
@@ -38,6 +37,15 @@ instruction_handler_t instruction_table[256] = {
     [0x37] = vm_div_reg_reg,  // DIV regd, regs
     [0x38] = vm_inc_reg,      // INC reg
     [0x39] = vm_dec_reg,      // DEC reg
+
+    // Logic instructions
+    [0x40] = vm_and_reg_im32, // AND reg, im32
+    [0x41] = vm_and_reg_reg,  // AND regd, regs
+    [0x42] = vm_or_reg_im32,  // OR reg, im32
+    [0x43] = vm_or_reg_reg,   // OR regd, regs
+    [0x44] = vm_xor_reg_im32, // XOR reg, im32
+    [0x45] = vm_xor_reg_reg,  // XOR regd, regs
+    [0x46] = vm_not_reg,      // NOT reg
 
     // Bitshift instructions
     [0x50] = vm_shl_reg_im32, // SHL reg, im32
