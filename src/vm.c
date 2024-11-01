@@ -126,7 +126,7 @@ int vm_run(VM *vm) {
   }
 
   if (!halted) {
-    printf("WARNING: Reach EOF without HALT...\n");
+    printf("WARNING: Reached EOF without HALT...\n");
   } else {
     DEBUG_PRINT("HALT encountered...\n");
   }
