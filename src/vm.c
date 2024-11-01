@@ -86,12 +86,23 @@ int init_vm_from_file(const char *input_filepath, const char *output_filepath,
   return 0;
 }
 
+/**
+ * @brief Run the VM
+ *
+ * @param vm The VM
+ * @return int Exit code
+ *
+ * Will run the VM from start of the code segment until HALT is encountered or
+ * the end of the code segment is reached. The exit code can be EXIT_SUCCESS or
+ * any of the error codes defined in defs.h.
+ */
 int vm_run(VM *vm) {
-
   clock_t start_time = clock();
   int halted = 0;
 
-  // NOTE: jump instructions may modify the IP independently of this loop
+  // NOTE: IP is incremented in the loop when reading the next instruction or
+  // it's arguments. Expected exit from the loop is when HALT is encountered,
+  // this condition is only a fallback for malformed code without HALT.
   for (vm->IP = 0, vm->instructions_count = 0;
        !halted && vm->IP < vm->code_size;) {
     if (vm->debug > 1)
@@ -142,6 +153,9 @@ int vm_run(VM *vm) {
   return EXIT_SUCCESS;
 }
 
+/**
+ * @brief Print the header of a data table
+ */
 void print_header(void) {
   printf("      ");
 
@@ -155,6 +169,13 @@ void print_header(void) {
   printf("\n");
 }
 
+/**
+ * @brief Pretty print a line of a data table
+ *
+ * @param index Current index
+ * @param data The data
+ * @param size Size of the data in bytes
+ */
 void print_data_line(size_t index, const Byte *data, size_t size) {
   printf("%04lX:", index);
   for (size_t j = 0; j < 16; j++) {
@@ -172,6 +193,12 @@ void print_data_line(size_t index, const Byte *data, size_t size) {
   printf("\n");
 }
 
+/**
+ * @brief Pretty print a data table to hexadecimal
+ *
+ * @param data The data
+ * @param size Size of the data in bytes
+ */
 void pretty_print_data(const Byte *data, size_t size) {
   print_header();
   for (size_t i = 0; i < size; i += 16) {
@@ -179,6 +206,11 @@ void pretty_print_data(const Byte *data, size_t size) {
   }
 }
 
+/**
+ * @brief Pretty print the state of the VM
+ *
+ * @param vm The VM
+ */
 void vm_print(const VM *vm) {
   printf("Registers:\n");
   printf("A:  0x%08X\n", vm->registers.A);
@@ -201,6 +233,11 @@ void vm_print(const VM *vm) {
   printf("\n");
 }
 
+/**
+ * @brief Free all memory allocated by the VM
+ *
+ * @param vm The VM
+ */
 void vm_free(VM *vm) {
   SAFE_FREE(&vm->data_segment);
   SAFE_FREE(&vm->code_segment);

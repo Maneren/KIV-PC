@@ -3,6 +3,7 @@
 
 #include "../vm.h"
 
+// Run the code and return if it returns unsuccessful erorr code
 #define PROPAGATE_ERROR(code)                                                  \
   {                                                                            \
     int status;                                                                \
@@ -10,6 +11,8 @@
       return status;                                                           \
   }
 
+// Assert that a condition is true and return if it is not
+// Optionally set a custom error message
 #define ASSERT(condition, ...)                                                 \
   if (!(condition)) {                                                          \
     snprintf(vm->error_msg, VM_ERROR_BUFFER_SIZE, __VA_ARGS__);                \

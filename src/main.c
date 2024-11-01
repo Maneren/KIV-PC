@@ -28,6 +28,7 @@ int main(int argc, char *argv[]) {
     return status;
   }
 
+  // load 0, 1 or 2 as debug level
   const char *debug_envvar = getenv("DEBUG");
   char debug_level = 0;
   if (debug_envvar) {
@@ -45,6 +46,7 @@ int main(int argc, char *argv[]) {
   status = vm_run(&vm);
 
   if (status != EXIT_SUCCESS) {
+    // flush stdout so it doesn't get mixed with the error message
     fflush(stdout);
 
     fprintf(stderr, "Program execution failed\n");
@@ -54,5 +56,5 @@ int main(int argc, char *argv[]) {
 
   vm_free(&vm);
 
-  return EXIT_SUCCESS;
+  return status;
 }
