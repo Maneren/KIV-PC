@@ -1,14 +1,13 @@
 #include "arithemtic.h"
 #include "call.h"
 #include "cmp.h"
+#include "common.h"
 #include "data.h"
 #include "io.h"
 #include "jump.h"
 #include "logic.h"
 #include "shift.h"
 #include "stack.h"
-
-int vm_nop(VM *_) { return 0; }
 
 typedef int (*instruction_handler_t)(VM *vm);
 

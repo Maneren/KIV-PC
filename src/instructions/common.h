@@ -36,4 +36,6 @@ int vm_write_im32(VM *vm, Number address, Number im32);
 int vm_push_im32(VM *vm, Number im32);
 int vm_pop_im32(VM *vm, Number *out);
 
+int vm_nop(VM *vm);
+
 #endif // INCLUDE_INSTRUCTIONS_COMMON_H_

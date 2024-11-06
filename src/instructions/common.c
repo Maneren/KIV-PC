@@ -105,3 +105,8 @@ int vm_pop_im32(VM *vm, Number *out) {
   vm->registers.SP -= sizeof(Number);
   return EXIT_SUCCESS;
 }
+
+int vm_nop(VM *vm) {
+  DEBUG_PRINT("NOP\n");
+  return 0;
+}
