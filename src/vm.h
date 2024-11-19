@@ -1,5 +1,5 @@
-#ifndef INCLUDE_SEMESTRALKA_VM_H_
-#define INCLUDE_SEMESTRALKA_VM_H_
+#ifndef INCLUDE_KMEMU_VM_H_
+#define INCLUDE_KMEMU_VM_H_
 
 #include <stddef.h>
 #include <stdio.h>
@@ -52,4 +52,4 @@ void vm_print(const VM *vm);
 
 void vm_free(VM *vm);
 
-#endif // INCLUDE_SEMESTRALKA_VM_H_
+#endif

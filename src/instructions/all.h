@@ -1,13 +1,8 @@
-#include "arithemtic.h"
 #include "call.h"
-#include "cmp.h"
 #include "common.h"
+#include "conditions.h"
 #include "data.h"
-#include "io.h"
-#include "jump.h"
-#include "logic.h"
-#include "shift.h"
-#include "stack.h"
+#include "operators.h"
 
 typedef int (*instruction_handler_t)(VM *vm);
 

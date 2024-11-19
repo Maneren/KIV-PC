@@ -1,5 +1,8 @@
 #include "../vm.h"
 
+int vm_cmp_reg_im32(VM *vm);
+int vm_cmp_reg_reg(VM *vm);
+
 int vm_jmp_im32(VM *vm);
 int vm_jmp_reg(VM *vm);
 int vm_je_im32(VM *vm);

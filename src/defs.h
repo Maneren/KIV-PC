@@ -1,3 +1,6 @@
+#ifndef INCLUDE_KMEMU_DEFS_H_
+#define INCLUDE_KMEMU_DEFS_H_
+
 #include <stdlib.h>
 
 #define EXIT_ARGS 1
@@ -17,3 +20,5 @@
 
 // Free the pointer only if it isn't NULL and then set it to NULL
 #define SAFE_FREE(x) ((x && *x) ? free(*x) : (void)0, *(x) = NULL)
+
+#endif

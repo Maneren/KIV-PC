@@ -101,9 +101,6 @@ int vm_set_reg(VM *vm, Byte reg, Number im32);
     WRITE_REG(A, a op B);                                                      \
   })
 
-int vm_push_im32(VM *vm, Number im32);
-int vm_pop_im32(VM *vm, Number *out);
-
 int vm_nop(VM *vm);
 
 #endif // INCLUDE_INSTRUCTIONS_COMMON_H_
