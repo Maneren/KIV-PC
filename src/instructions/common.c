@@ -58,37 +58,6 @@ int vm_get_reg(VM *vm, Byte reg, Number *out) {
   return EXIT_SUCCESS;
 }
 
-int vm_code_read_reg(VM *vm, Byte *out) {
-  size_t address = vm->IP;
-  ASSERT(address + sizeof(Byte) <= vm->code_size,
-         "Read beyond code segment from address 0x%08lX", address);
-  *out = vm->code_segment[address];
-  vm->IP += sizeof(Byte);
-  return EXIT_SUCCESS;
-}
-
-int vm_code_read_im32(VM *vm, Number *out) {
-  size_t address = vm->IP;
-  ASSERT(address + sizeof(Number) <= vm->code_size,
-         "Read beyond code segment from address 0x%08lX", address);
-  *out = *(Number *)(vm->code_segment + address);
-  vm->IP += sizeof(Number);
-  return EXIT_SUCCESS;
-}
-
-int vm_read_im32(VM *vm, Number address, Number *out) {
-  ASSERT(address >= 0 && (size_t)address + sizeof(Number) <= vm->data_size,
-         "Read outside data segment from address 0x%08X", address);
-  *out = *(Number *)(vm->data_segment + address);
-  return EXIT_SUCCESS;
-}
-int vm_write_im32(VM *vm, Number address, Number im32) {
-  ASSERT(address >= 0 && (size_t)address + sizeof(Number) <= vm->data_size,
-         "Write outside data segment to address 0x%08X", address);
-  *(Number *)(vm->data_segment + address) = im32;
-  return EXIT_SUCCESS;
-}
-
 int vm_push_im32(VM *vm, Number im32) {
   Number address = vm->registers.SP;
   vm->registers.SP += sizeof(Number);

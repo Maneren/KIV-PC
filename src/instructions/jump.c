@@ -3,161 +3,38 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int vm_jmp_im32(VM *vm) {
-  Number address;
-  PROPAGATE_ERROR(vm_code_read_im32(vm, &address));
-
+INSTRUCTION(jmp_im32, {
+  READ_ARG(Number, address);
   DEBUG_PRINT("JMP 0x%04X\n", address);
-
   ASSERT(address >= 0 && (size_t)address < vm->code_size,
          "Relative jump to invalid address 0x%08X", address);
-
   vm->IP = address;
+})
 
-  return EXIT_SUCCESS;
-}
-
-int vm_jmp_reg(VM *vm) {
-  Byte reg;
-  PROPAGATE_ERROR(vm_code_read_reg(vm, &reg));
-
+INSTRUCTION(jmp_reg, {
+  READ_REG_ARG(reg, address);
   DEBUG_PRINT("JMP R%02hhX\n", reg);
-
-  Number address;
-  PROPAGATE_ERROR(vm_get_reg(vm, reg, &address));
-
   ASSERT(address >= 0 && (size_t)address < vm->code_size,
          "Relative jump to invalid address 0x%08X", address);
-
   vm->IP = address;
+})
 
-  return EXIT_SUCCESS;
-}
+#define CONDITIONAL_JUMP(name, cond, debug_name)                               \
+  INSTRUCTION(name##_im32, {                                                   \
+    READ_ARG(Number, address);                                                  \
+    DEBUG_PRINT(#debug_name " 0x%04X\n", address);                             \
+    if (cond) {                                                                \
+      vm->IP += (size_t)address;                                               \
+      ASSERT(vm->IP < vm->code_size,                                           \
+             "Jump to address 0x%08lX outside code segment", vm->IP);          \
+    }                                                                          \
+  })
 
-int vm_je_im32(VM *vm) {
-  Number address;
-  PROPAGATE_ERROR(vm_code_read_im32(vm, &address));
-
-  DEBUG_PRINT("JE 0x%04X\n", address);
-
-  if (vm->flags & FLAG_EQ) {
-    size_t target = vm->IP + (size_t)address;
-    ASSERT(target < vm->code_size,
-           "Jump to address 0x%08lX outside code segment", target);
-    vm->IP = target;
-  }
-
-  return EXIT_SUCCESS;
-}
-
-int vm_jne_im32(VM *vm) {
-  Number address;
-  PROPAGATE_ERROR(vm_code_read_im32(vm, &address));
-
-  DEBUG_PRINT("JNE 0x%04X\n", address);
-
-  if (!(vm->flags & FLAG_EQ)) {
-    size_t target = vm->IP + (size_t)address;
-    ASSERT(target < vm->code_size,
-           "Jump to address 0x%08lX outside code segment", target);
-    vm->IP = target;
-  }
-
-  return EXIT_SUCCESS;
-}
-
-int vm_jg_im32(VM *vm) {
-  Number address;
-  PROPAGATE_ERROR(vm_code_read_im32(vm, &address));
-
-  DEBUG_PRINT("JG 0x%04X\n", address);
-
-  if (vm->flags & FLAG_GT) {
-    size_t target = vm->IP + (size_t)address;
-    ASSERT(target < vm->code_size,
-           "Jump to address 0x%08lX outside code segment", target);
-    vm->IP = target;
-  }
-
-  return EXIT_SUCCESS;
-}
-
-int vm_jge_im32(VM *vm) {
-  Number address;
-  PROPAGATE_ERROR(vm_code_read_im32(vm, &address));
-
-  DEBUG_PRINT("JGE 0x%04X\n", address);
-
-  if (vm->flags & FLAG_GT || vm->flags & FLAG_EQ) {
-    size_t target = vm->IP + (size_t)address;
-    ASSERT(target < vm->code_size,
-           "Jump to address 0x%08lX outside code segment", target);
-    vm->IP = target;
-  }
-
-  return EXIT_SUCCESS;
-}
-
-int vm_jng_im32(VM *vm) {
-  Number address;
-  PROPAGATE_ERROR(vm_code_read_im32(vm, &address));
-
-  DEBUG_PRINT("JNG 0x%04X\n", address);
-
-  if (vm->flags & FLAG_LT || vm->flags & FLAG_EQ) {
-    size_t target = vm->IP + (size_t)address;
-    ASSERT(target < vm->code_size,
-           "Jump to address 0x%08lX outside code segment", target);
-    vm->IP = target;
-  }
-
-  return EXIT_SUCCESS;
-}
-
-int vm_jl_im32(VM *vm) {
-  Number address;
-  PROPAGATE_ERROR(vm_code_read_im32(vm, &address));
-
-  DEBUG_PRINT("JL 0x%04X\n", address);
-
-  if (vm->flags & FLAG_LT) {
-    size_t target = vm->IP + (size_t)address;
-    ASSERT(target < vm->code_size,
-           "Jump to address 0x%08lX outside code segment", target);
-    vm->IP = target;
-  }
-
-  return EXIT_SUCCESS;
-}
-
-int vm_jle_im32(VM *vm) {
-  Number address;
-  PROPAGATE_ERROR(vm_code_read_im32(vm, &address));
-
-  DEBUG_PRINT("JLE 0x%04X\n", address);
-
-  if (vm->flags & FLAG_LT || vm->flags & FLAG_EQ) {
-    size_t target = vm->IP + (size_t)address;
-    ASSERT(target < vm->code_size,
-           "Jump to address 0x%08lX outside code segment", target);
-    vm->IP = target;
-  }
-
-  return EXIT_SUCCESS;
-}
-
-int vm_jnl_im32(VM *vm) {
-  Number address;
-  PROPAGATE_ERROR(vm_code_read_im32(vm, &address));
-
-  DEBUG_PRINT("JNL 0x%04X\n", address);
-
-  if (vm->flags & FLAG_GT || vm->flags & FLAG_EQ) {
-    size_t target = vm->IP + (size_t)address;
-    ASSERT(target < vm->code_size,
-           "Jump to address 0x%08lX outside code segment", target);
-    vm->IP = target;
-  }
-
-  return EXIT_SUCCESS;
-}
+CONDITIONAL_JUMP(je, (vm->flags & FLAG_EQ), JE)
+CONDITIONAL_JUMP(jne, (!(vm->flags & FLAG_EQ)), JNE)
+CONDITIONAL_JUMP(jl, (vm->flags & FLAG_LT), JL)
+CONDITIONAL_JUMP(jg, (vm->flags & FLAG_GT), JG)
+CONDITIONAL_JUMP(jge, (vm->flags & FLAG_GT || vm->flags & FLAG_EQ), JGE)
+CONDITIONAL_JUMP(jle, (vm->flags & FLAG_LT || vm->flags & FLAG_EQ), JLE)
+CONDITIONAL_JUMP(jnl, (vm->flags & FLAG_GT || vm->flags & FLAG_EQ), JNL)
+CONDITIONAL_JUMP(jng, (vm->flags & FLAG_LT || vm->flags & FLAG_EQ), JNG)
