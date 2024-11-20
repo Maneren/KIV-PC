@@ -1,0 +1,66 @@
+% LTeX: language=en-US
+\documentclass[12pt,a4paper]{paper}
+\usepackage{a4wide}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage[english]{babel}
+\usepackage{hyphsubst}
+\usepackage{graphicx}
+\usepackage{indentfirst}
+\usepackage{microtype}
+\usepackage{float}
+\usepackage{amsmath}
+\usepackage{esvect}
+\usepackage{listings}
+\usepackage{parskip}
+
+\selectlanguage{english}
+\PassOptionsToPackage{hyphens}{url}
+
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=black,
+    filecolor=magenta,      
+    urlcolor=blue,
+    pdftitle={Elektroviz},
+}
+\urlstyle{same}
+
+% define helper command for typesetting code
+\newcommand{\code}[1]{\texttt{#1}}
+
+\chardef\_=`_
+
+% increase spacing between table rows
+\renewcommand{\arraystretch}{1.25}
+
+\begin{document}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.8\textwidth]{pic/kiv-cmyk-en}
+\end{figure}
+
+\begin{center}
+	\vspace{.5cm}
+	\LARGE{KMEMU - MISC CPU Computer Emulator}\\
+	\large{Semester project - KIV/PC 2024/25}
+\end{center}
+
+\vfill
+
+\noindent
+University of West Bohemia in Pilsen \hfill Pavel Altmann - A23B0264P\\
+Department of Computer Science \hfill \today
+\thispagestyle{empty}
+
+\newpage
+\setcounter{page}{1}
+
+\tableofcontents
+
+\newpage
+
+\section{Assignment}
+
+\end{document}
