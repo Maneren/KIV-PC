@@ -29,7 +29,7 @@ execute: $(BIN)
 valgrind: build
 	valgrind --leak-check=full --track-origins=yes --show-leak-kinds=all ./$(BIN) $(ARGS) 2>&1 | tee valgrind.log
 
-$(DOC_TARGET):
+$(DOC_TARGET): $(DOC_SOURCE)
 	tectonic $(DOC_SOURCE) -o $(DOC_FOLDER) --keep-logs
 
 dist: $(BIN) $(DOC_TARGET)
