@@ -29,7 +29,7 @@
   }
 
 #define DEBUG_PRINT(...)                                                       \
-  if (vm->debug)                                                               \
+  if (vm->debug > DEBUG_NONE)                                                  \
   printf(__VA_ARGS__)
 
 #define DEBUG_PRINT_INSTRUCTION(name, reg1, reg2)                              \

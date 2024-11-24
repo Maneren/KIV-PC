@@ -4,8 +4,8 @@
 #include <stddef.h>
 #include <stdio.h>
 
-#define MEMORY_SIZE 256 * 1024
-#define STACK_SIZE 16 * 1024
+#define VM_MEMORY_SIZE 256 * 1024
+#define VM_STACK_SIZE 16 * 1024
 
 #define VM_ERROR_BUFFER_SIZE 256
 
@@ -27,6 +27,12 @@ typedef struct {
   Number SP;
 } Registers;
 
+typedef enum {
+  DEBUG_NONE = 0,
+  DEBUG_INSTRUCTION = 1,
+  DEBUG_MEMORY = 2,
+} DebugLevel;
+
 typedef struct {
   Registers registers;
   size_t IP;
@@ -40,7 +46,7 @@ typedef struct {
   FILE *output;
   unsigned char flags;
   size_t instructions_count;
-  unsigned char debug;
+  DebugLevel debug;
 } VM;
 
 int init_vm_from_file(const char *input_filepath, const char *output_filepath,

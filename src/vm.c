@@ -67,9 +67,10 @@ int init_vm_from_file(const char *input_filepath, const char *output_filepath,
     return EXIT_FILE;
   }
 
-  SAFE_ALLOCATE(vm->code_segment, MEMORY_SIZE, sizeof(Byte));
+  SAFE_ALLOCATE(vm->code_segment, VM_MEMORY_SIZE, sizeof(Byte));
 
-  size_t code_size = fread(vm->code_segment, sizeof(Byte), MEMORY_SIZE, input);
+  size_t code_size =
+      fread(vm->code_segment, sizeof(Byte), VM_MEMORY_SIZE, input);
 
   if (!feof(input)) {
     fprintf(stderr, "Failed to read code segment: '%s'\n", input_filepath);
@@ -80,7 +81,7 @@ int init_vm_from_file(const char *input_filepath, const char *output_filepath,
 
   fclose(input);
 
-  SAFE_ALLOCATE(vm->stack_segment, STACK_SIZE, sizeof(Byte));
+  SAFE_ALLOCATE(vm->stack_segment, VM_STACK_SIZE, sizeof(Byte));
   SAFE_ALLOCATE(vm->error_msg, VM_ERROR_BUFFER_SIZE, sizeof(char));
 
   return 0;
@@ -105,7 +106,7 @@ int vm_run(VM *vm) {
   // this condition is only a fallback for malformed code without HALT.
   for (vm->IP = 0, vm->instructions_count = 0;
        !halted && vm->IP < vm->code_size;) {
-    if (vm->debug > 1)
+    if (vm->debug == DEBUG_MEMORY)
       vm_print(vm);
 
     Byte instruction = vm->code_segment[vm->IP];
@@ -137,7 +138,7 @@ int vm_run(VM *vm) {
     DEBUG_PRINT("HALT encountered...\n");
   }
 
-  if (vm->debug) {
+  if (vm->debug > DEBUG_NONE) {
     printf("Execution time: %.3f seconds (%zu instructions)\n",
            (float)(clock() - start_time) / CLOCKS_PER_SEC,
            vm->instructions_count);
