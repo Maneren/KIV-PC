@@ -66,9 +66,9 @@
     vm->IP += sizeof(type);                                                    \
   }
 
-int vm_get_reg(VM *vm, Byte reg, Number *out);
+int vm_get_reg(VM *vm, Byte reg, Word *out);
 #define READ_REG(reg, var)                                                     \
-  Number var;                                                                  \
+  Word var;                                                                  \
   {                                                                            \
     PROPAGATE_ERROR(vm_get_reg(vm, reg, &var));                                \
   }
@@ -81,7 +81,7 @@ int vm_get_reg(VM *vm, Byte reg, Number *out);
   READ_REG_ARG(reg##_d, val##_d);                                              \
   READ_REG_ARG(reg##_s, val##_s);
 
-int vm_set_reg(VM *vm, Byte reg, Number im32);
+int vm_set_reg(VM *vm, Byte reg, Word im32);
 #define WRITE_REG(reg, value)                                                  \
   {                                                                            \
     PROPAGATE_ERROR(vm_set_reg(vm, reg, value));                               \
@@ -97,7 +97,7 @@ int vm_set_reg(VM *vm, Byte reg, Number im32);
 #define BINARY_OPERATION_REG_IM32(name, op)                                    \
   INSTRUCTION(name##_reg_im32, {                                               \
     READ_REG_ARG(A, a);                                                        \
-    READ_ARG(Number, B);                                                       \
+    READ_ARG(Word, B);                                                       \
     WRITE_REG(A, a op B);                                                      \
   })
 

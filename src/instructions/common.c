@@ -2,7 +2,7 @@
 #include <stddef.h>
 #include <stdlib.h>
 
-int vm_set_reg(VM *vm, Byte reg, Number im32) {
+int vm_set_reg(VM *vm, Byte reg, Word im32) {
   switch (reg) {
   case 0x01:
     vm->registers.A = im32;
@@ -30,7 +30,7 @@ int vm_set_reg(VM *vm, Byte reg, Number im32) {
   return EXIT_SUCCESS;
 }
 
-int vm_get_reg(VM *vm, Byte reg, Number *out) {
+int vm_get_reg(VM *vm, Byte reg, Word *out) {
   switch (reg) {
   case 0x01:
     *out = vm->registers.A;

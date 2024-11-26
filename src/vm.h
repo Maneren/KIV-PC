@@ -9,7 +9,7 @@
 
 #define VM_ERROR_BUFFER_SIZE 256
 
-typedef signed int Number;
+typedef signed int Word;
 typedef unsigned char Byte;
 
 enum {
@@ -19,12 +19,12 @@ enum {
 };
 
 typedef struct {
-  Number A;
-  Number B;
-  Number C;
-  Number D;
-  Number S;
-  Number SP;
+  Word A;
+  Word B;
+  Word C;
+  Word D;
+  Word S;
+  Word SP;
 } Registers;
 
 typedef enum {
