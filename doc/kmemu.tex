@@ -2,27 +2,29 @@
 \documentclass[12pt,a4paper]{paper}
 \usepackage{a4wide}
 \usepackage[margin=2.5cm]{geometry}
-\usepackage[english]{babel}
+\usepackage[czech,english]{babel}
 \usepackage{hyphsubst}
 \usepackage{graphicx}
 \usepackage{indentfirst}
-\usepackage{microtype}
 \usepackage{float}
 \usepackage{amsmath}
 \usepackage{esvect}
 \usepackage{listings}
 \usepackage{parskip}
+\usepackage{tikz}
+\usepackage{pgf-umlcd}
+\usepackage{underscore}
 
 \selectlanguage{english}
 \PassOptionsToPackage{hyphens}{url}
 
-\usepackage{hyperref}
+\usepackage[pdfborderstyle={/S/U/W 1}]{hyperref}
 \hypersetup{
     colorlinks=true,
     linkcolor=black,
     filecolor=magenta,      
     urlcolor=blue,
-    pdftitle={Elektroviz},
+    pdftitle={KMEMU - MISC CPU Computer Emulator},
 }
 \urlstyle{same}
 
@@ -62,5 +64,201 @@ Department of Computer Science \hfill \today
 \newpage
 
 \section{Assignment}
+\begin{otherlanguage}{czech}
+
+Naprogramujte v ANSI C přenositelnou \textbf{konzolovou aplikaci}, v podstatě
+jednoduchý, ale plně funkční, \textit{emulátor} teoretického počítače – nazvěme
+ho třeba K’s Machine (KM) – s procesorem architektury MISC (= Minimal
+Instruction Set Computer), který bude na hostitelském počítači vykonávat
+programy (v binární podobě, tj. ve strojovém kódu) pro níže popsaný
+minimalistický teoretický počítač.
+
+Emulátor se bude spouštět příkazem
+
+\begin{quotation}
+\code{X:\textbackslash>kmemu.exe3 \textlangle program.kmx\textrangle
+[\textlangle výstupní soubor[.txt]\textrangle]}
+\end{quotation}
+
+Symbol \code{\textlangle program ve strojovém kódu\textrangle} zastupuje povinný
+parametr – název vstupního binárního souboru s programem ve strojovém kódu pro
+procesor KM. Přípona \code{.kmx} (\foreignlanguage{english}{= \underline{K}’s
+\underline{M}achine E\underline{x}ecutable}; obdoba windowsovského \code{.exe},
+\foreignlanguage{english}{= \underline{Exe}cutable}), označující spustitelný
+soubor pro náš teoretický procesor, musí být vždy uvedena. Symbol
+\code{\textlangle výstupní soubor\textrangle} pak představuje nepovinný
+parametr, kterým je jméno textového souboru, do kterého se bude ukládat výstup
+při vykonávání programu, tj. informace/hodnoty, které emulátor vypisuje na
+obrazovku při vykonávání instrukcí programu. Není-li druhý, nepovinný, parametr
+uveden, směrujte výstup emulátoru do konzole (do standardního streamu
+\code{stdout}).
+
+Úkolem Vámi vyvinutého programu tedy bude:
+
+\begin{enumerate}
+\item Načíst prvním parametrem určený spustitelný soubor (program) ve strojovém
+    kódu ve formátu KMX pro níže popsaný teoretický procesor. \\
+\item Vytvořit (podle údajů uložených ve spustitelném souboru) kódový a datový
+    segment pro běh programu. \\
+\item Vykonat program uložený v kódovém segmentu provedením všech jeho
+    instrukcí, včetně smyček, volání podprogramů, atd. \\
+\item Provádí-li se právě instrukce, jejímž úkolem je vypsat nějaký údaj na
+    obrazovku, vypsat tento údaj do konzole, případně (je-li při spuštění
+    programu uveden nepovinný druhý parametr) uložit do specifikovaného
+    výstupního textového souboru. \\
+\item Po dokončení vykonávání programu uvolnit paměť obsazenou datovým a kódovým
+segmentem vykonávaného programu a následně emulátor ukončit. \\
+
+\end{enumerate}
+
+Váš program může být během testování spuštěn například takto (v operačním
+systému Windows):
+
+
+\begin{quotation}
+\code{X:\textbackslash>kmemu.exe "E:\textbackslash My Work\textbackslash
+Test\textbackslash mersenne.kmx"\ mersenne.txt}
+\end{quotation}
+
+Uvažujte všechny možné specifikace (uvedení úplné cesty, relativní cesty, atp.)
+jak vstupního, tak výstupního souboru, které jsou přípustné v daném operačním
+systému. Pokud nebude na příkazové řádce uveden alespoň jeden parametr (tj.
+jméno binárního spustitelného souboru ve formátu KMX), vypište chybové hlášení a
+stručný návod k použití programu (v angličtině). Návratová hodnota funkce
+\code{int main(...)} bude v tomto případě 1.
+
+\end{otherlanguage}
+
+\section{Problem analysis}
+
+The main problem that permeates the whole assignment is handling of binary data.
+Everything from binary input file to addressing both individual bytes and
+four-byte integers in the computer's memory. Closely related is going to be the
+problem of ensuring no out-of-bounds (OOB) access to the computer's memory.
+
+The solution is to use an array of bytes to represent the computer's memory
+
+
+The assignment can be divided into two parts: (1) handling binary data in the IO
+and the computer's memory and (2) efficiently reading and evaluating
+instructions, while ensuring no invalid behavior can occur. This includes mainly
+preventing out-of-bounds access to the computer's memory and undefined
+arithmetical operations (like division by zero).
+
+Algorithmically the assignment is relatively simple, in its heart it's just a
+while loop, that executes the current instruction and moves to the next one,
+until either \code{HALT} or the end of file (\code{EOF}) is reached or an error
+occurs. The primary source of complexity, in my opinion, is the repetitive code,
+which is inherently difficult to debug.
+
+\section{Implementation}
+
+The internal state of the emulated computer is stored in a \code{struct} called
+\hyperlink{vm}{\code{VM}} (virtual machine). It holds all relevant values, like
+registers, data, code and stack segments (and their sizes), the instruction
+pointer (\code{IP}) and few other helper variables.
+
+The program is then segmented into two parts: driver code and VM code. The driver
+code handles CLI, IO and calling the relevant VM code, that in turn handles the
+execution of the individual instructions itself and the relevant state changes. 
+
+\subsection{Data Structures}
+
+Main data structure of the program is the \hypertarget{vm}{\code{VM}} struct. It's accessed
+through interface based on the OOP paradigm with method-like functions
+(functions that have a pointer to the \code{struct} as their first parameter).
+
+\begin{center}
+\begin{tikzpicture}
+    \begin{class}[text width=8cm]{VM}{0,0}
+        \attribute{\code{registers} : \code{Registers}}
+        \attribute{\code{IP} : \code{size\_t}}
+        \attribute{\code{code_segment} : \code{Byte*}}
+        \attribute{\code{code_size} : \code{size_t}}
+        \attribute{\code{data_segment} : \code{Byte*}}
+        \attribute{\code{data_size} : \code{size_t}}
+        \attribute{\code{stack_segment} : \code{Byte*}}
+        \attribute{\code{stack_size} : \code{size_t}}
+        \attribute{\code{error_msg} : \code{char*}}
+        \attribute{\code{output} : \code{FILE*}}
+        \attribute{\code{flags} : \code{unsigned char}}
+        \attribute{\code{instructions\_count} : \code{size_t}}
+        \attribute{\code{debug} : \code{DebugLevel}}
+
+        \operation{\code{vm_run(VM *vm)} : \code{int}}
+        \operation{\code{vm_print(VM *vm)}}
+        \operation{\code{vm_free(VM *vm)}}
+    \end{class}
+\end{tikzpicture}
+\end{center}
+
+\begin{itemize}
+    \item \code{registers} - registers stored in a \code{struct} called
+        \hyperlink{registers}{\code{Registers}} (below). 
+    \item \code{*_segment} - memory segments stored as \code{Byte} arrays, with
+        sizes stored in respective \code{*_size} fields.
+    \item \code{IP} - instruction pointer, points to the current instruction in
+        the \code{code_segment}.
+    \item \code{error_msg} - a buffer for error messages, size
+        \code{VM_ERROR_BUFFER_SIZE}.
+    \item \code{output} - a pointer to the file to which the output should be
+        written.
+    \item \code{flags} - a bitfield indicating conditions, set by the \code{CMP}
+        instruction, read by conditional jumps and zeroed otherwise. For
+        possible values, see the \code{FLAG} enum.
+    \item \code{instructions_count} - the count of executed instructions, used
+        for debugging.
+    \item \code{debug} - a flag indicating whether to print debug messages.
+\end{itemize}
+
+The \hypertarget{registers}{\code{Registers}} struct is defined as follows 
+
+\begin{center}
+\begin{tikzpicture}
+    \begin{class}[text width=10cm]{Registers}{0,0}
+        \attribute{\code{A} : \code{Word}}
+        \attribute{\code{B} : \code{Word}}
+        \attribute{\code{C} : \code{Word}}
+        \attribute{\code{D} : \code{Word}}
+        \attribute{\code{S} : \code{Word}}
+        \attribute{\code{SP} : \code{Word}}
+
+        \operation{\code{vm_get_reg(VM *vm, Byte reg, Word *out)} : \code{int}}
+        \operation{\code{vm_set_reg(VM *vm, Byte reg, Word value)} : \code{void}}
+    \end{class}
+\end{tikzpicture}
+\end{center}
+
+\textit{Note:} \code{Word} is an alias for \code{signed long int}, a word of
+K's Machine, and \code{Byte} is an alias for \code{unsigned char}, one byte.
+
+\subsection{Instructions}
+
+While implementing the individual instructions, great care was given to
+eliminating as much repetition as possible. First I tried using helper
+functions, but they still required quite a lot of boilerplate for error handling
+and propagation. So over time I slowly switched more and more to macros,
+eventually allowing me to implement all binary operation instructions each on
+single line, only given the name and operator. This resulted in over 2 times
+less code than initially, significantly improving readability of the definitions
+itself. On the other hand, it comes at the cost of over 100 lines of macro
+definitions, making that part of codebase rather complicated and hard to debug.
+However, in my opinion it is worth making this tradeoff, since the project
+doesn't require long-term support, therefore maintainability is not a major
+concern.
+
+\subsection{Data structures}
+
+
+\subsection{Algorithms}
+
+Similarly to data structures, not many algorithms were needed. The main
+algorithm, that is the core of the program, is a simple infinite loop, that each
+iteration read a byte from the code segment and gives control to the handler
+code of corresponding instruction. 
+
+All instructions operate on a simple basis of loading inputs from the code
+segment, executing the operation and storing the result back to either registers
+or the data segment of the memory. 
 
 \end{document}
