@@ -34,7 +34,6 @@ $(DOC_TARGET): $(DOC_SOURCE)
 
 dist: $(BIN) $(DOC_TARGET)
 	rm -rf dist dist.zip
-	git clone file://$(shell git rev-parse --show-toplevel) dist
-	cp $(BIN) dist
+	git clone --depth=1 file://$(shell git rev-parse --show-toplevel) dist
 	cp $(DOC_TARGET) dist
-	cd dist && zip -r9 ../dist.zip Makefile $(HEADERS) $(SRCS) $(BIN) $(DOC)
+	cd dist && zip -r9 ../dist.zip Makefile $(HEADERS) $(SRCS) $(DOC) $(DOC_SOURCE)
