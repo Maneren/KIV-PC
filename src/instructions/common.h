@@ -54,11 +54,11 @@
 
 // Debug print instruction with two register arguments
 #define DEBUG_PRINT_INSTRUCTION(name, reg1, reg2)                              \
-  DEBUG_PRINT(name " R%d, R%d\n", reg1, reg2);
+  DEBUG_PRINT(name " R%hhX, R%hhX\n", reg1, reg2);
 
 // Debug print instruction with register and immediate arguments
 #define DEBUG_PRINT_INSTRUCTION_IM(name, reg, im)                              \
-  DEBUG_PRINT(name " R%d, %d\n", reg, im);
+  DEBUG_PRINT(name " R%hhX, 0x%08X\n", reg, im);
 
 // Convert little-endian bytes to a type in platform endianness
 #define BYTES_TO(type, var, ptr)                                               \

@@ -30,20 +30,20 @@ int pop(VM *vm, Word *out) {
 
 INSTRUCTION(push, {
   READ_REG_ARG(reg, val);
-  DEBUG_PRINT("PUSH R%02hhX\n", reg);
+  DEBUG_PRINT("PUSH R%hhX\n", reg);
   TRY(push(vm, val));
 })
 
 INSTRUCTION(pop, {
   READ_REG_ARG(reg, val);
-  DEBUG_PRINT("POP R%02hhX\n", reg);
+  DEBUG_PRINT("POP R%hhX\n", reg);
   TRY(pop(vm, &val));
   WRITE_REG(reg, val);
 })
 
 INSTRUCTION(call_im32, {
   READ_ARG(Word, address);
-  DEBUG_PRINT("CALL 0x%04X\n", address);
+  DEBUG_PRINT("CALL 0x%08X\n", address);
   ASSERT(address >= 0 && (size_t)address < vm->code_size,
          "Call to invalid address 0x%08X", address);
   TRY(push(vm, vm->IP));
@@ -52,7 +52,7 @@ INSTRUCTION(call_im32, {
 
 INSTRUCTION(call_reg, {
   READ_REG_ARG(reg, address);
-  DEBUG_PRINT("CALL R%02hhX\n", reg);
+  DEBUG_PRINT("CALL R%hhX\n", reg);
   ASSERT(address >= 0 && (size_t)address < vm->code_size,
          "Call to invalid address 0x%08X", address);
   TRY(push(vm, vm->IP));

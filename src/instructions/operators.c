@@ -12,13 +12,13 @@ BINARY_OPERATION_REG_IM32(div, /)
 
 INSTRUCTION(inc_reg, {
   READ_REG_ARG(reg, val);
-  DEBUG_PRINT("INC R%d\n", reg);
+  DEBUG_PRINT("INC R%hhX\n", reg);
   WRITE_REG(reg, val + 1);
 })
 
 INSTRUCTION(dec_reg, {
   READ_REG_ARG(reg, val);
-  DEBUG_PRINT("DEC R%d\n", reg);
+  DEBUG_PRINT("DEC R%hhX\n", reg);
   WRITE_REG(reg, val - 1);
 })
 
@@ -38,6 +38,6 @@ BINARY_OPERATION_REG_REG(xor, !=)
 
 INSTRUCTION(not_reg, {
   READ_REG_ARG(reg, val);
-  DEBUG_PRINT("NOT R%d\n", reg);
+  DEBUG_PRINT("NOT R%hhX\n", reg);
   WRITE_REG(reg, !val);
 })

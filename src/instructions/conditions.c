@@ -22,7 +22,7 @@ INSTRUCTION(cmp_reg_reg, {
 
 INSTRUCTION(jmp_im32, {
   READ_ARG(Word, address);
-  DEBUG_PRINT("JMP 0x%04X\n", address);
+  DEBUG_PRINT("JMP 0x%08X\n", address);
   ASSERT(address >= 0 && (size_t)address < vm->code_size,
          "Relative jump to invalid address 0x%08X", address);
   vm->IP = address;
@@ -30,7 +30,7 @@ INSTRUCTION(jmp_im32, {
 
 INSTRUCTION(jmp_reg, {
   READ_REG_ARG(reg, address);
-  DEBUG_PRINT("JMP R%02hhX\n", reg);
+  DEBUG_PRINT("JMP R%hhX\n", reg);
   ASSERT(address >= 0 && (size_t)address < vm->code_size,
          "Relative jump to invalid address 0x%08X", address);
   vm->IP = address;
@@ -39,7 +39,7 @@ INSTRUCTION(jmp_reg, {
 #define CONDITIONAL_JUMP(name, cond, debug_name)                               \
   INSTRUCTION(name##_im32, {                                                   \
     READ_ARG(Word, address);                                                   \
-    DEBUG_PRINT(#debug_name " 0x%04X\n", address);                             \
+    DEBUG_PRINT(#debug_name " 0x%08X\n", address);                             \
     if (cond) {                                                                \
       vm->IP += (size_t)address;                                               \
       ASSERT(vm->IP < vm->code_size,                                           \
