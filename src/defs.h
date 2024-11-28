@@ -21,9 +21,22 @@
     exit(EXIT_MEMORY);                                                         \
   }
 
+// Try reallocating memory
+//
+// If the realloc fails, print an error message and exit
+#define SAFE_REALLOCATE(var, count, size)                                      \
+  var = realloc(var, count * size);                                            \
+  if (var == NULL) {                                                           \
+    fprintf(stderr, "Allocation error. Aborting\n");                           \
+    exit(EXIT_MEMORY);                                                         \
+  }
+
 // Try freeing the pointer and set it to NULL
 //
 // If the pointer is already NULL or points to NULL, do nothing
 #define SAFE_FREE(x) ((x && *x) ? free(*x) : (void)0, *(x) = NULL)
+
+// Return the maximum of two values
+#define max(a, b) ((a) > (b) ? (a) : (b))
 
 #endif

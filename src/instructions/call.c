@@ -1,19 +1,25 @@
+#include "../defs.h"
 #include "common.h"
 #include <stdio.h>
 
 int push(VM *vm, Word im32) {
-  Word address = vm->registers.SP;
+  size_t address = (size_t)vm->registers.SP;
   vm->registers.SP += sizeof(Word);
-  ASSERT(address >= 0 && (size_t)address + sizeof(Word) <= vm->stack_size,
-         "Write outside stack segment to address 0x%08X", address);
+  size_t required_size = address + sizeof(Word);
+  if (required_size >= vm->stack_size) {
+    size_t new_size = max(vm->stack_size * 2, required_size);
+    SAFE_REALLOCATE(vm->stack_segment, new_size, sizeof(Word));
+    vm->stack_size = new_size;
+  }
   BYTES_FROM(Word, im32, &vm->stack_segment[address]);
   return EXIT_SUCCESS;
 }
+
 int pop(VM *vm, Word *out) {
+  vm->registers.SP -= sizeof(Word);
   ASSERT(vm->registers.SP >= 0 &&
              (size_t)vm->registers.SP + sizeof(Word) <= vm->stack_size,
          "Read outside stack segment from address 0x%08X", vm->registers.SP);
-  vm->registers.SP -= sizeof(Word);
   BYTES_TO(Word, *out, &vm->stack_segment[vm->registers.SP]);
   return EXIT_SUCCESS;
 }

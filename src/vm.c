@@ -224,7 +224,7 @@ void vm_print(const VM *vm) {
   pretty_print_data(vm->code_segment, vm->code_size);
   printf("\n");
   printf("Stack segment: [0x%lX]\n", vm->stack_size);
-  pretty_print_data(vm->stack_segment, (vm->stack_size / 0x10 + 1) * 0x10);
+  pretty_print_data(vm->stack_segment, vm->stack_size);
   printf("\n");
 }
 
