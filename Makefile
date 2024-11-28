@@ -11,7 +11,7 @@ SRCS = $(wildcard src/*.c) $(wildcard src/**/*.c)
 HEADERS = $(wildcard src/*.h) $(wildcard src/**/*.h)
 OBJS = $(SRCS:.c=.o)
 
-%.o: %.c
+.c.o:
 	$(CC) -c $(CFLAGS) $< -o $@
 
 $(BIN): $(OBJS)
