@@ -54,6 +54,23 @@
 #define DEBUG_PRINT_INSTRUCTION_IM(name, reg, im)                              \
   DEBUG_PRINT(name " R%d, %d\n", reg, im);
 
+// Convert little-endian bytes to a type in platform endianness
+#define BYTES_TO(type, var, ptr)                                               \
+  var = 0;                                                                     \
+  {                                                                            \
+    for (size_t i = 0; i < sizeof(type); i++) {                                \
+      var |= ((type)(ptr)[i] << (i * 8));                                      \
+    }                                                                          \
+  }
+
+// Convert a type to bytes in little-endian order
+#define BYTES_FROM(type, var, ptr)                                             \
+  {                                                                            \
+    for (size_t i = 0; i < sizeof(type); i++) {                                \
+      *(ptr + i) = (Byte)((var >> (i * 8)) & 0xFF);                            \
+    }                                                                          \
+  }
+
 // Try to read a value of a given type from the data segment to a given variable
 //
 // Errors:
@@ -65,7 +82,7 @@
            "Attempted to read " #type                                          \
            " outside of the data segment (address 0x%08X) at IP 0x%08lX",      \
            address, vm->IP);                                                   \
-    var = *(type *)(vm->data_segment + address);                               \
+    BYTES_TO(type, var, vm->data_segment + address);                           \
   }
 
 // Try to write a value of a given type from a given variable to the data
@@ -78,7 +95,7 @@
          "Attempted to write " #type                                           \
          " outside of the data segment (address 0x%08X) at IP 0x%08lX",        \
          address, vm->IP);                                                     \
-  *(type *)(vm->data_segment + address) = var;
+  BYTES_FROM(type, var, vm->data_segment + address);
 
 // Try to read a value of a given type from the code segment to a given variable
 //
@@ -93,7 +110,7 @@
            "Attempted to read " #type                                          \
            " argument outside of the code segment (IP 0x%08lX)",               \
            vm->IP);                                                            \
-    var = *(type *)(vm->code_segment + vm->IP);                                \
+    BYTES_TO(type, var, &vm->code_segment[vm->IP]);                            \
     vm->IP += sizeof(type);                                                    \
   }
 

@@ -6,15 +6,15 @@ int push(VM *vm, Word im32) {
   vm->registers.SP += sizeof(Word);
   ASSERT(address >= 0 && (size_t)address + sizeof(Word) <= vm->stack_size,
          "Write outside stack segment to address 0x%08X", address);
-  *(Word *)(vm->stack_segment + vm->registers.SP) = im32;
+  BYTES_FROM(Word, im32, &vm->stack_segment[address]);
   return EXIT_SUCCESS;
 }
 int pop(VM *vm, Word *out) {
   ASSERT(vm->registers.SP >= 0 &&
              (size_t)vm->registers.SP + sizeof(Word) <= vm->stack_size,
          "Read outside stack segment from address 0x%08X", vm->registers.SP);
-  *out = *(Word *)(vm->stack_segment + vm->registers.SP);
   vm->registers.SP -= sizeof(Word);
+  BYTES_TO(Word, *out, &vm->stack_segment[vm->registers.SP]);
   return EXIT_SUCCESS;
 }
 
