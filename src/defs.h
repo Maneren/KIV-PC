@@ -9,16 +9,21 @@
 #define EXIT_EXEC 4
 #define EXIT_MEMORY 128
 
-// Use calloc instead of malloc so printing the memory doesn't touch
-// uninitialized memory
-#define SAFE_ALLOCATE(x, n, s)                                                 \
-  x = calloc(n, s);                                                            \
-  if (x == NULL) {                                                             \
+// Try allocating memory
+//
+// If the allocation fails, print an error message and exit
+//
+// Uses calloc so printing the memory doesn't touch uninitialized memory
+#define SAFE_ALLOCATE(var, count, size)                                        \
+  var = calloc(count, size);                                                   \
+  if (var == NULL) {                                                           \
     fprintf(stderr, "Allocation error. Aborting\n");                           \
     exit(EXIT_MEMORY);                                                         \
   }
 
-// Free the pointer only if it isn't NULL and then set it to NULL
+// Try freeing the pointer and set it to NULL
+//
+// If the pointer is already NULL or points to NULL, do nothing
 #define SAFE_FREE(x) ((x && *x) ? free(*x) : (void)0, *(x) = NULL)
 
 #endif

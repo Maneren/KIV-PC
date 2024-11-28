@@ -81,7 +81,6 @@ int init_vm_from_file(const char *input_filepath, const char *output_filepath,
 
   fclose(input);
 
-  SAFE_ALLOCATE(vm->stack_segment, VM_STACK_SIZE, sizeof(Byte));
   SAFE_ALLOCATE(vm->error_msg, VM_ERROR_BUFFER_SIZE, sizeof(char));
 
   return 0;
@@ -129,7 +128,7 @@ int vm_run(VM *vm) {
       return EXIT_UNKNOWN;
     }
 
-    PROPAGATE_ERROR(handler(vm));
+    TRY(handler(vm));
   }
 
   if (!halted) {

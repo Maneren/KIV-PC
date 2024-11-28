@@ -49,13 +49,21 @@ typedef struct {
   DebugLevel debug;
 } VM;
 
+// Initialize the VM
+//
+// output_filepath may be NULL, in which case stdout will be used
 int init_vm_from_file(const char *input_filepath, const char *output_filepath,
                       VM *vm);
 
+// Run the VM
+//
+// Assumes that the VM is initialized
 int vm_run(VM *vm);
 
+// Print the current state of the VM
 void vm_print(const VM *vm);
 
+// Free the memory used by the VM
 void vm_free(VM *vm);
 
 #endif
