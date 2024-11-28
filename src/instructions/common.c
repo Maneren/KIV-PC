@@ -23,8 +23,7 @@ int vm_set_reg(VM *vm, Byte reg, Word im32) {
     vm->registers.SP = im32;
     break;
   default:
-    vm->error_msg = "Invalid register ID";
-    return EXIT_FAILURE;
+    THROW_ERROR(EXIT_FAILURE, "Invalid register ID '%02hhX'", reg);
   }
 
   return EXIT_SUCCESS;
@@ -51,8 +50,7 @@ int vm_get_reg(VM *vm, Byte reg, Word *out) {
     *out = vm->registers.SP;
     break;
   default:
-    vm->error_msg = "Invalid register ID";
-    return EXIT_FAILURE;
+    THROW_ERROR(EXIT_FAILURE, "Invalid register ID '%02hhX'", reg);
   }
 
   return EXIT_SUCCESS;

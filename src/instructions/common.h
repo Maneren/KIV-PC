@@ -31,14 +31,20 @@
     return EXIT_SUCCESS;                                                       \
   }
 
+// Set the error message and return the error code
+#define THROW_ERROR(code, ...)                                                 \
+  {                                                                            \
+    snprintf(vm->error_msg, VM_ERROR_BUFFER_SIZE, __VA_ARGS__);                \
+    return code;                                                               \
+  }
+
 // Assert that a condition is true
 //
 // On success return EXIT_SUCCESS, else return EXIT_FAILURE and sprintf error
 // message
 #define ASSERT(condition, ...)                                                 \
   if (!(condition)) {                                                          \
-    snprintf(vm->error_msg, VM_ERROR_BUFFER_SIZE, __VA_ARGS__);                \
-    return EXIT_FAILURE;                                                       \
+    THROW_ERROR(EXIT_FAILURE, __VA_ARGS__);                                    \
   }
 
 // Print debug information if debug mode is enabled
