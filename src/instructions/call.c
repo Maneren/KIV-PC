@@ -58,7 +58,8 @@ INSTRUCTION(call_reg, {
 INSTRUCTION(ret, {
   DEBUG_PRINT("RET\n");
   ASSERT(vm->registers.SP > 0, "Return from empty stack");
-  Word address = vm->registers.SP;
+  Word address;
+  TRY(pop(vm, &address));
   ASSERT(address >= 0 && (size_t)address < vm->code_size,
          "Return to invalid address 0x%08X", address);
   vm->IP = address;
