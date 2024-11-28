@@ -2,6 +2,9 @@
 #include "common.h"
 #include <stdio.h>
 
+// Push a value onto the stack
+//
+// If the stack is full, double its size
 int push(VM *vm, Word im32) {
   size_t address = (size_t)vm->registers.SP;
   vm->registers.SP += sizeof(Word);
@@ -15,6 +18,7 @@ int push(VM *vm, Word im32) {
   return EXIT_SUCCESS;
 }
 
+// Pop a value from the stack
 int pop(VM *vm, Word *out) {
   vm->registers.SP -= sizeof(Word);
   ASSERT(vm->registers.SP >= 0 &&
@@ -42,7 +46,7 @@ INSTRUCTION(call_im32, {
   DEBUG_PRINT("CALL 0x%04X\n", address);
   ASSERT(address >= 0 && (size_t)address < vm->code_size,
          "Call to invalid address 0x%08X", address);
-  TRY(push(vm, (Word)vm->IP));
+  TRY(push(vm, vm->IP));
   vm->IP = address;
 })
 
@@ -51,7 +55,7 @@ INSTRUCTION(call_reg, {
   DEBUG_PRINT("CALL R%02hhX\n", reg);
   ASSERT(address >= 0 && (size_t)address < vm->code_size,
          "Call to invalid address 0x%08X", address);
-  TRY(push(vm, (Word)vm->IP));
+  TRY(push(vm, vm->IP));
   vm->IP = address;
 })
 
