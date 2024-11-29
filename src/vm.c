@@ -76,7 +76,7 @@ int init_vm_from_file(const char *input_filepath, const char *output_filepath,
 
   SAFE_ALLOCATE(vm->error_msg, VM_ERROR_BUFFER_SIZE, sizeof(char));
 
-  return 0;
+  return EXIT_SUCCESS;
 }
 
 /**

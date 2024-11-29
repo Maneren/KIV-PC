@@ -58,5 +58,5 @@ int vm_get_reg(VM *vm, Byte reg, Word *out) {
 
 int vm_nop(VM *vm) {
   DEBUG_PRINT("NOP\n");
-  return 0;
+  return EXIT_SUCCESS;
 }
