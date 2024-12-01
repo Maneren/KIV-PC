@@ -50,6 +50,11 @@ int init_vm_from_file(const char *input_filepath, const char *output_filepath,
     return EXIT_FILE;
   }
 
+  if (data_size_header < 0) {
+    fprintf(stderr, "Invalid data size: '%s'\n", input_filepath);
+    return EXIT_FILE;
+  }
+
   size_t data_size = (size_t)data_size_header;
 
   SAFE_ALLOCATE(vm->data_segment, data_size, sizeof(Byte));
@@ -73,6 +78,11 @@ int init_vm_from_file(const char *input_filepath, const char *output_filepath,
   vm->code_size = code_size;
 
   fclose(input);
+
+  if (vm->code_segment[vm->code_size - 1] != 0x00) {
+    fprintf(stderr, "Code segment should end with NULL\n");
+    return EXIT_FILE;
+  }
 
   SAFE_ALLOCATE(vm->error_msg, VM_ERROR_BUFFER_SIZE, sizeof(char));
 
