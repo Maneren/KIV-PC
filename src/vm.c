@@ -103,11 +103,14 @@ int vm_run(VM *vm) {
   clock_t start_time = clock();
   int halted = 0;
 
+  vm->IP = 0;
+  vm->instructions_count = 0;
+
   // NOTE: IP is incremented in the loop when reading the next instruction or
   // it's arguments. Expected exit from the loop is when HALT is encountered,
-  // this condition is only a fallback for malformed code without HALT.
-  for (vm->IP = 0, vm->instructions_count = 0;
-       !halted && vm->IP < vm->code_size;) {
+  // which will set the `halted` flag. The other half of the condition is only
+  // a fallback for malformed code without trailing HALT.
+  while (!halted && vm->IP < vm->code_size) {
     if (vm->debug == DEBUG_MEMORY)
       vm_print(vm);
 
