@@ -64,7 +64,7 @@ INSTRUCTION(outc_reg, {
 INSTRUCTION(outs_reg, {
   READ_REG_ARG(reg, address);
   DEBUG_PRINT("OUTS R%hhX\n", reg);
-  for (int ch, i = 0; (ch = vm->code_segment[address + i]); i++) {
+  for (int ch; (ch = vm->data_segment[address++]);) {
     ASSERT(address >= 0 && (size_t)address < vm->data_size,
            "Read outside data segment from address 0x%08X", address);
     putc(ch, vm->output);
