@@ -1,5 +1,5 @@
 CC ?= gcc
-CFLAGS = -Wall -Wextra -pedantic -std=c99 -g3 -O3
+CFLAGS = -Wall -Wextra -pedantic -std=c99 -g3 -O1
 BIN = kmemu.exe
 
 DOC_FOLDER = doc
