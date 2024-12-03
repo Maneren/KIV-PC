@@ -7,8 +7,8 @@
 #include <string.h>
 #include <time.h>
 
-const char KMX_HEADER[3] = "KMX";
-const size_t KMX_HEADER_SIZE = 3;
+#define KMX_HEADER_SIZE 3
+#define KMX_HEADER "KMX"
 
 int init_vm_from_file(const char *input_filepath, const char *output_filepath,
                       VM *vm) {
