@@ -38,7 +38,7 @@ int init_vm_from_file(const char *input_filepath, const char *output_filepath,
     return EXIT_FILE;
   }
 
-  if (strncmp(header, KMX_HEADER, KMX_HEADER_SIZE) != 0) {
+  if (memcmp(header, KMX_HEADER, KMX_HEADER_SIZE) != 0) {
     fprintf(stderr, "Invalid KMX file header: '%s'\n", input_filepath);
     return EXIT_FILE;
   }
