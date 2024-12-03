@@ -68,7 +68,7 @@ static instruction_handler_t instruction_table[256] = {
     [0x81] = vm_call_reg,  // CALL reg
     [0x82] = vm_ret,       // RET
 
-    // MISC
+    // Miscellaneous
     [0x90] = vm_nop, // NOP
 
     // IO instructions
