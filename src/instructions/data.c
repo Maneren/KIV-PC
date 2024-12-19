@@ -92,7 +92,7 @@ INSTRUCTION(inps_reg, {
   for (int ch; (ch = getchar()) != '\n'; address++) {
     ASSERT(ch != EOF,
            "Unexpected end of file while reading character from stdin");
-    ASSERT(address >= 0 && (size_t)address + sizeof(char) <= vm->data_size,
+    ASSERT(address >= 0 && (size_t)address < vm->data_size,
            "Write outside data segment to address 0x%08X", address);
     vm->data_segment[address] = (char)ch;
   }
