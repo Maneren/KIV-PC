@@ -24,7 +24,7 @@ clean:
 build: $(BIN)
 
 execute: $(BIN)
-	./$(BIN) $(ARGS)
+	time ./$(BIN) $(ARGS)
 
 valgrind: build
 	valgrind --leak-check=full --track-origins=yes --show-leak-kinds=all ./$(BIN) $(ARGS) 2>&1 | tee valgrind.log
