@@ -22,15 +22,6 @@
       return status;                                                           \
   }
 
-// Define an instruction with a name and handler code
-#define INSTRUCTION(name, code)                                                \
-  int vm_##name(VM *vm) {                                                      \
-    {                                                                          \
-      code                                                                     \
-    }                                                                          \
-    return EXIT_SUCCESS;                                                       \
-  }
-
 // Set the error message and return the error code
 #define THROW_ERROR(code, ...)                                                 \
   {                                                                            \
@@ -59,6 +50,15 @@
 // Debug print instruction with register and immediate arguments
 #define DEBUG_PRINT_INSTRUCTION_IM(name, reg, im)                              \
   DEBUG_PRINT(name " R%hhX, 0x%08X\n", reg, im);
+
+// Define an instruction with a name and handler code
+#define INSTRUCTION(name, code)                                                \
+  int vm_##name(VM *vm) {                                                      \
+    {                                                                          \
+      code                                                                     \
+    }                                                                          \
+    return EXIT_SUCCESS;                                                       \
+  }
 
 // Convert little-endian bytes to a type in platform endianness
 #define BYTES_TO(type, var, ptr)                                               \
