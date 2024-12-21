@@ -24,6 +24,7 @@ int init_vm_from_file(const char *input_filepath, const char *output_filepath,
 
     if (!vm->output) {
       fprintf(stderr, "Failed to open output file: '%s'\n", output_filepath);
+      fclose(input);
       return EXIT_ARGS;
     }
   } else {
@@ -35,11 +36,13 @@ int init_vm_from_file(const char *input_filepath, const char *output_filepath,
 
   if (fread(header, sizeof(char), KMX_HEADER_SIZE, input) != KMX_HEADER_SIZE) {
     fprintf(stderr, "Failed to read header: '%s'\n", input_filepath);
+    fclose(input);
     return EXIT_FILE;
   }
 
   if (memcmp(header, KMX_HEADER, KMX_HEADER_SIZE) != 0) {
     fprintf(stderr, "Invalid KMX file header: '%s'\n", input_filepath);
+    fclose(input);
     return EXIT_FILE;
   }
 
@@ -47,11 +50,13 @@ int init_vm_from_file(const char *input_filepath, const char *output_filepath,
 
   if (fread(&data_size_header, sizeof(int), 1, input) != 1) {
     fprintf(stderr, "Failed to read data size: '%s'\n", input_filepath);
+    fclose(input);
     return EXIT_FILE;
   }
 
   if (data_size_header < 0) {
     fprintf(stderr, "Invalid data size: '%s'\n", input_filepath);
+    fclose(input);
     return EXIT_FILE;
   }
 
@@ -62,6 +67,7 @@ int init_vm_from_file(const char *input_filepath, const char *output_filepath,
 
   if (fread(vm->data_segment, sizeof(Byte), data_size, input) != data_size) {
     fprintf(stderr, "Failed to read data segment: '%s'\n", input_filepath);
+    fclose(input);
     return EXIT_FILE;
   }
 
@@ -72,6 +78,7 @@ int init_vm_from_file(const char *input_filepath, const char *output_filepath,
 
   if (!feof(input)) {
     fprintf(stderr, "Failed to read code segment: '%s'\n", input_filepath);
+    fclose(input);
     return EXIT_FILE;
   }
 
