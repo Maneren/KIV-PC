@@ -207,12 +207,18 @@ void pretty_print_data(const Byte *data, size_t size) {
   }
 }
 
-#define BYTE_TO_BINARY_PATTERN "%c%c%c%c%c%c%c%c"
-#define BYTE_TO_BINARY(byte)                                                   \
-  ((byte) & 0x80 ? '1' : '0'), ((byte) & 0x40 ? '1' : '0'),                    \
-      ((byte) & 0x20 ? '1' : '0'), ((byte) & 0x10 ? '1' : '0'),                \
-      ((byte) & 0x08 ? '1' : '0'), ((byte) & 0x04 ? '1' : '0'),                \
-      ((byte) & 0x02 ? '1' : '0'), ((byte) & 0x01 ? '1' : '0')
+// Helpers for binary number printing
+#define BYTE_TO_BINARY_PATTERN "%s"
+#define BYTE_TO_BINARY(byte) byte_to_binary(byte)
+
+const char *byte_to_binary(int x) {
+  static char b[9];
+  b[8] = '\0';
+  for (int z = 128, i = 0; z > 0; z >>= 1, i++) {
+    b[i] = ((x & z) == z) ? '1' : '0';
+  }
+  return b;
+}
 
 /**
  * @brief Pretty print the state of the VM
