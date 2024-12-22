@@ -1,5 +1,5 @@
 % LTeX: language=en-US
-\documentclass[10pt,a4paper,final]{article}
+\documentclass[12pt,a4paper,final]{article}
 \usepackage{a4wide}
 \usepackage[czech,english]{babel}
 \usepackage{hyphsubst}
@@ -190,6 +190,7 @@ Main data structure of the program is the \hypertarget{vm}{\code{struct VM}}
 defined in \code{src/vm.h} as follows:
 
 \begin{center}
+\vspace{0.5cm}
 \begin{tikzpicture}
     \begin{class}[text width=8cm]{VM}{0,0}
         \attribute{\code{registers} : \code{Registers}}
@@ -211,6 +212,7 @@ defined in \code{src/vm.h} as follows:
         \operation{\code{vm_free(VM *vm)} : \code{void}}
     \end{class}
 \end{tikzpicture}
+\vspace{0.5cm}
 \end{center}
 
 \begin{itemize}
@@ -240,6 +242,7 @@ defined in \code{src/vm.h} as follows:
 The \hypertarget{registers}{\code{Registers}} struct is defined as follows 
 
 \begin{center}
+\vspace{0.5cm}
 \begin{tikzpicture}
     \begin{class}[text width=10cm]{Registers}{0,0}
         \attribute{\code{A} : \code{Word}}
@@ -253,6 +256,7 @@ The \hypertarget{registers}{\code{Registers}} struct is defined as follows
         \operation{\code{vm_set_reg(VM *vm, Byte reg, Word value)} : \code{void}}
     \end{class}
 \end{tikzpicture}
+\vspace{0.5cm}
 \end{center}
 
 \subsection{Algorithms}
@@ -271,7 +275,7 @@ All instruction handlers operate on a very simple basis: they load inputs from
 the code segment, execute an operation, store the result in either registers or
 the data segment of the memory and return control to the main loop. 
 
-\subsubsection{Handler Contract}
+\subsubsection{Handler contract}
 \label{sec:contract}
 
 All instruction handlers adhere to a simple implicit contract that dictates the
@@ -284,8 +288,8 @@ handling of the \code{VM} struct with following rules:
         immediately following the op-code byte. 
     \item When the control is returned to the main loop, the instruction pointer
         should point to the next instruction to be executed.
-    \item The handler should return status code according to the
-        \nameref{sec:errors} section.
+    \item The handler should return status code according to the guidelines in
+        the section \nameref{sec:errors}.
 \end{itemize}
 
 
@@ -293,14 +297,14 @@ handling of the \code{VM} struct with following rules:
 \subsubsection{Repetition}
 \label{sec:repetition}
 
-As indicated in the problem analysis section, a significant effort was invested
-in the elimination of repetition in the implementation of the individual
-instructions. Initially, only helper functions were used; however, these still
-necessitated a substantial amount of boilerplate code, particularly for error
-handling and propagation. Eventually, a rewrite of the instruction handlers into
-macros was implemented, which enabled for example the definition of any binary
-operation instruction handler on a single line, given only the name and
-operator. For more details, see the section \nameref{sec:macros} below.
+As indicated in the section \nameref{sec:analysis}, a significant effort was
+invested in the elimination of repetition in the implementation of the
+individual instructions. Initially, only helper functions were used; however,
+these still necessitated a substantial amount of boilerplate code, particularly
+for error handling and propagation. Eventually, a rewrite of the instruction
+handlers into macros was implemented, which enabled for example the definition
+of any binary operation instruction handler on a single line, given only the
+name and operator. For more details, see the section \nameref{sec:macros} below.
 
 This approach yielded a code that was almost two times shorter than the one
 created using the helper functions, while simultaneously enhancing the
@@ -314,21 +318,32 @@ maintainability is not a major concern.
 \subsection{Macros}
 \label{sec:macros}
 
-Due to inherent repetitiveness of the instruction handlers, it was necessary to
-define a set of macros to make the code more readable and maintainable. Thus,
-most of the used macros are applicable to the context of the instruction
-handlers and expect a \code{vm} in the calling scope. Only exception is the
-\code{INSTRUCTION} family of macros that define the \code{vm} variable as a
-handler parameter.
+As mentioned in the section \nameref{sec:repetition}, the implementation of the
+individual instructions was rewritten into macros, which allowed for a
+substantial reduction of the codebase. Other areas of the program could not make
+such great use of the macros, so most of the used macros are applicable
+primarily to the context of the instruction handlers and as such expect a
+initialized variable \code{vm} in the calling scope and the calling function to
+behave according to the contract described in the section
+\nameref{sec:contract}. Only exception is the \code{INSTRUCTION} family of
+macros that define the \code{vm} variable as a handler parameter.
+
+As a convention, all handlers are named in the format \code{\textlangle
+name\textrangle\_\textlangle arguments\textrangle}, where \code{name} is the
+mnemonic of the instruction and \code{arguments} is an underscore-separated list
+of types of the arguments (either \code{reg} or \code{im32}), e.g.
+\code{add_reg_im32} -- add an immediate value to a register -- or
+\code{cmp_reg_reg} -- compare values in two registers and set the flags
+accordingly.
 
 \subsubsection{Macro conventions}
 \label{sec:macrosconventions}
 
-Macros that "return" or "propagate" do so from the calling scope to its caller
--- that is, they expand to a \code{return} statement.
+Macros that ``return" or ``propagate" values do so from the calling scope to its
+caller -- that is, they expand to a \code{return} statement.
 
 The general conventions for macro arguments naming, specific use case is in the
-comment at the beginning of the macro definition:
+description of each macro:
 
 \begin{itemize}
     \item \code{reg} -- a register
@@ -344,37 +359,88 @@ comment at the beginning of the macro definition:
     \item \code{code} -- the code to be executed
 \end{itemize}
 
-\subsubsection{List of defined macros}
+\subsubsection{List of instruction macros}
 \label{sec:macroslist}
 
 A non-exhaustive list of the most important macros used in the instruction
-handlers implementations:
+handlers implementations with short descriptions. Details can be found at their
+definitions in the file \code{src/instruction/common.h}. First are the
+infallible macros:
 
 \begin{itemize}
     \item \code{DEBUG_PRINT(...)} -- if \code{vm->debug} is not equal to
-        \code{DEBUG_NONE}, print the \code{...} arguments using \code{printf}.
-    \item \code{DEBUG_PRINT_INSTRUCTION(name, reg1, reg2)} -- print debug
-        representation of the given register-register instruction.
-    \item \code{DEBUG_PRINT_INSTRUCTION_IM(name, reg, im)} -- print debug
-        representation of the given register-immediate instruction.
+        \code{DEBUG_NONE}, print the arguments using \code{printf}.
+    \item \code{DEBUG_PRINT_INSTRUCTION(name, reg1, reg2)} -- \code{DEBUG_PRINT}
+        a representation of the given instruction operating on two registers.
+    \item \code{DEBUG_PRINT_INSTRUCTION_IM(name, reg, im)} -- \code{DEBUG_PRINT}
+        a representation of the given instruction operating on a register and an
+        immediate value.
 
     \item \code{INSTRUCTION(name, code)} -- define a handler for an instruction
         called \code{name} with \code{code} as body.
+    \item \code{BINARY_OPERATION_REG_REG(name, op)} -- define a handler for a
+        binary operation between two registers with \code{op} as the operator.
+    \item \code{BINARY_OPERATION_REG_IM32(name, op)} -- define a handler for a
+        binary operation between a register and an immediate value with
+        \code{op} as the operator.
+
+    \item \code{BYTES_TO(type, var, ptr)} -- convert little-endian bytes
+        starting at \code{ptr} to a \code{type} in platform endianness and
+        assign it the variable \code{var}.
+    \item \code{BYTES_FROM(type, var, ptr)} -- convert a \code{type var} to
+        little-endian bytes and write them to memory starting at \code{ptr}.
 \end{itemize}
 
-\begin{note}
-    See also the section \nameref{sec:errors} for a list of error related
-    macros.
-\end{note}
+And the fallible macros (details of their error handling are provided in the
+section \nameref{sec:errors}):
+
+\begin{itemize}
+    \item \code{READ(type, var, address)} -- read a \code{type} from the data
+        byte index \code{address} and assign it to \code{var}.
+    \item \code{WRITE(type, var, address)} -- write a \code{type} \code{var} to
+        the data segment at the byte index \code{address}.
+    
+    \item \code{READ_ARG(type, var)} -- read a \code{type} from the code segment
+        starting at \code{vm->IP} and assign it to \code{var}.
+    \item \code{READ_REG(reg, var)} -- read a \code{Word} from the register
+        with index \code{reg} and assign it to \code{var}.
+    \item \code{READ_REG_ARG(var, val)} -- read a value to variable \code{val} 
+        from a register given by the byte at the current \code{vm->IP} (the
+        register index is saved into \code{var}).
+    \item \code{READ_REG_DS_PAIR(reg, val)} -- read a pair of values from
+        registers given by arguments. Saves the first value in \code{val} with
+        suffix \code{_d} and the second value in \code{val} with suffix
+        \code{_s}. 
+    \item \code{WRITE_REG(reg, value)} -- write a \code{value} to the register
+        with index \code{reg}.
+\end{itemize}
+
+Practical example of the use of the instruction definition macros in the
+\code{load_reg_im32} instruction:
+
+\begin{minted}{c}
+INSTRUCTION(load_reg_im32, {
+  READ_ARG(Byte, reg);
+  READ_ARG(Word, address);
+  DEBUG_PRINT_INSTRUCTION_IM("LOAD", reg, address);
+  READ(Word, value, address);
+  WRITE_REG(reg, value);
+})
+\end{minted}
+
+The \code{INSTRUCTION} macro is used to define the handler itself and all other
+is passed into it as the second argument. Then a register argument and a
+immediate value argument are read from the code segment and assigned to
+\code{reg} (with the value) and \code{val} respectively. The \code{DEBUG_PRINT_INSTRUCTION_IM}
 
 \subsection{Error handling}
 \label{sec:errors}
 
-As previously stated in the \nameref{sec:repetition} section, the KMEMU emulator
-employs error handling through the use of macros, which streamline the process
-of checking conditions and propagating errors. The \code{ASSERT} macro, for
+Similarly to the implementation of the instruction handlers, the error handling
+is also largely based on the use of macros, which streamline the process of
+checking conditions and propagating errors. The \code{ASSERT} macro, for
 example, is used to verify conditions and throw human-readable errors if they
-are not met. Full list of related macros is provided below:
+are not met. Full list of error handling macros:
 
 \begin{itemize}
 \item \code{TRY(code)} -- execute \code{code} and if an error occurs, propagate
@@ -386,8 +452,8 @@ are not met. Full list of related macros is provided below:
     code \code{EXIT_FAILURE} from the \code{stdlib.h} header.
 \end{itemize}
 
-An illustration of a practical use of the error handling macros is provided by
-the following example of the \code{ret} instruction implementation:
+An illustration of a practical use of the error handling macros in the
+\code{ret} instruction implementation:
 
 \begin{minted}{c}
 INSTRUCTION(ret, {
@@ -450,6 +516,51 @@ This stands in contrast to the user-facing exit codes defined in the file
         usually due to a \code{malloc} call returning \code{NULL}.
 \end{itemize}
 
+
+\subsection{Memory management}
+
+The KMEMU program requires a relatively small number of memory allocations that
+are straightforward in nature. The memory segments and the error message buffer
+are the only components that are dynamically allocated on the heap; all others
+are allocated on the stack. The most significant challenge in terms of memory
+management is the handling of the stack, which begins empty and expands
+dynamically as required.
+
+To improve the safety of the memory management, the standard functions are
+wrapped into helper macros ,  and
+. Furthermore,  is used rather than 
+to ensure the virtual memory is initialized to zero and thus behaves
+deterministically on every run, even if the user program read it before
+initialization.
+
+In order to enhance the safety of the memory management, the standard functions
+are enveloped within helper macros, designated as \code{SAFE_ALLOCATE},
+\code{SAFE_REALLOCATE}, and \code{SAFE_FREE}. Moreover, the \code{calloc}
+function is employed in lieu of the \code{malloc} function to ensure that
+emulated memory is zero-initialized and, consequently, exhibits deterministic
+behavior during every execution, even in instances where the user program
+accesses the memory prior to its own initialization.
+
+\begin{itemize}
+    \item \code{SAFE_ALLOCATE(ptr, size)} -- allocate a block of memory of
+        \code{size} bytes using \code{calloc}. In the event that the allocation
+        process encounters an error, the macro prints an error message directly
+        to the standard error stream and exits with an error code of
+        \code{EXIT_MEMORY}.
+    \item \code{SAFE_REALLOCATE(ptr, size)} -- reallocate a block of memory
+        \code{ptr} to \code{size} bytes using \code{realloc}. In the event that
+        the reallocation process encounters an error, the macro prints an
+        error message directly to the standard error stream and exits with an
+        error code of \code{EXIT_MEMORY}.
+    \item \code{SAFE_FREE(ptr)} -- free a block of memory \code{ptr} using
+        \code{free}. Accepts a pointer to the pointer that is to be freed, with
+        the intention of setting it to \code{NULL} following the completion of
+        the freeing process. This precautionary measure is implemented to
+        prevent instances of double frees. Moreover, if the passed pointer is
+        already \code{NULL}, it is simply ignored.
+\end{itemize}
+
+
 \section{User manual}
 \label{sec:manual}
 
@@ -457,7 +568,7 @@ The KMEMU program provides a command-line interface (CLI) that allows users to
 load and execute programs written in the KMX format as defined in the problem
 statement. 
 
-The CLI accepts the following signature:
+The CLI accepts the following argument signature:
 
 \begin{quotation}
 \code{X:\textbackslash> kmemu.exe \textlangle input_file\textrangle\ 
@@ -478,9 +589,12 @@ following values are accepted as defined in the \code{DebugLevel} enum:
 
 \begin{itemize}
     \item \code{0} or unset -- no debug messages
-    \item \code{1} -- print executed instructions
-    \item \code{2} -- print executed instructions, state of the memory after each
-        instruction and the runtime information
+    \item \code{1} -- print log of executed instructions
+    \item \code{2} or greater -- print log of executed instructions, state of the memory
+        after each instruction and detailed runtime information at the end.
+        \textbf{Warning:} this option may produce a substantial amount of
+        output, potentially in the range of multiple gigabytes even for
+        relatively simple programs.
 \end{itemize}
 
 \section{Conclusion}
@@ -488,8 +602,8 @@ following values are accepted as defined in the \code{DebugLevel} enum:
 
 In summary, my KMEMU project accomplished its primary objective of developing a
 functional emulator for the theoretical K's Machine with a MISC architecture.
-The emulator was implemented in C 99, ensuring high portability across different
-platforms. The key results achieved include:
+The emulator was implemented in standard C 99, ensuring high portability across
+different platforms. The key results achieved include:
 
 \begin{itemize}
     \item \textbf{Functionality}: The emulator correctly executes programs
@@ -497,13 +611,18 @@ platforms. The key results achieved include:
         including arithmetic, memory access, conditionals, control flow and
         subroutine calls.
     \item \textbf{Performance}: The emulator demonstrated adequate performance
-        with reasonable times observed on various test programs on the
-        development machine, with an approximate runtime of 12 nanoseconds per
-        instruction. Specifically, the sample bubble sort program ran on average
-        for 459 microseconds.
+        with reasonable speed observed on various test programs on the
+        development machine, with an approximate throughput of 80 million
+        instructions per second. For example, the sample bubble sort program
+        ran on average for 459 microseconds while executing 3846 instructions.
     \item \textbf{Error Handling}: Robust error handling mechanisms were
         implemented to manage invalid instructions, out-of-bounds memory access,
         and other potential issues.
+    \item \textbf{Portability}: The emulator was successfully compiled and
+        executed on multiple platforms, including Windows, Linux and Android.
+    \item \textbf{User-Friendly Interface}: The CLI provided a user-friendly
+        interface for loading and executing KMX programs, that provides clear
+        and informative error messages in case of errors.
 \end{itemize}
 
 The assignment was completed successfully, meeting all the specified
@@ -513,7 +632,7 @@ produce output either to the console or a specified file. Additionally, the
 program provides reasonably helpful error messages and usage instructions when
 incorrect parameters are provided.
 
-However, two areas were identified where improvements could be made:
+However, two areas were identified where substantial improvements could be made:
 
 \begin{itemize}
     \item \textbf{Testing}: Although the project was successfully validated,
