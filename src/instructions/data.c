@@ -2,7 +2,7 @@
 #include "common.h"
 
 INSTRUCTION(mov_reg_im32, {
-  READ_REG_ARG(reg, val);
+  READ_ARG(Byte, reg);
   READ_ARG(Word, im32);
   DEBUG_PRINT_INSTRUCTION_IM("MOV", reg, im32);
   WRITE_REG(reg, im32);
@@ -21,7 +21,7 @@ INSTRUCTION(movsd, {
 })
 
 INSTRUCTION(load_reg_im32, {
-  READ_REG_ARG(reg, val);
+  READ_ARG(Byte, reg);
   READ_ARG(Word, address);
   DEBUG_PRINT_INSTRUCTION_IM("LOAD", reg, address);
   READ(Word, value, address);
