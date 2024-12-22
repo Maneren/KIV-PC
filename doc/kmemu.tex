@@ -1,15 +1,15 @@
 % LTeX: language=en-US
-\documentclass[12pt,a4paper]{paper}
+\documentclass[10pt,a4paper,final]{article}
 \usepackage{a4wide}
-\usepackage[margin=2.5cm]{geometry}
 \usepackage[czech,english]{babel}
 \usepackage{hyphsubst}
+\usepackage{xevlna}
+\usepackage{lmodern}
 \usepackage{graphicx}
 \usepackage{indentfirst}
 \usepackage{float}
 \usepackage{amsmath}
 \usepackage{esvect}
-\usepackage{listings}
 \usepackage{parskip}
 \usepackage{tikz}
 \usepackage{pgf-umlcd}
@@ -17,7 +17,6 @@
 \usepackage{enumitem}
 \usepackage{minted}
 
-\selectlanguage{english}
 \PassOptionsToPackage{hyphens}{url}
 
 \usepackage[pdfborderstyle={/S/U/W 1}]{hyperref}
@@ -44,6 +43,8 @@
 % increase spacing between table rows
 \renewcommand{\arraystretch}{1.25}
 
+\selectlanguage{english}
+
 \begin{document}
 
 \begin{figure}[H]
@@ -51,17 +52,19 @@
 	\includegraphics[width=0.8\textwidth]{pic/kiv-cmyk-en}
 \end{figure}
 
+\vspace{.5cm}
+
 \begin{center}
+	\LARGE{KMEMU -- MISC CPU Computer Emulator}\\
 	\vspace{.5cm}
-	\LARGE{KMEMU - MISC CPU Computer Emulator}\\
-	\large{Semester project - KIV/PC 2024/25}
+	\large{Semester project -- KIV/PC 2024/25}
 \end{center}
 
 \vfill
 
 \noindent
-University of West Bohemia in Pilsen \hfill Pavel Altmann - A23B0264P\\
-Department of Computer Science \hfill \today
+University of West Bohemia in Pilsen \hfill Pavel Altmann -- A23B0264P\\
+Department of Computer Science and Engineering \hfill \today
 \thispagestyle{empty}
 
 \newpage
@@ -72,6 +75,7 @@ Department of Computer Science \hfill \today
 \newpage
 
 \section{Assignment}
+\label{sec:assignment}
 \begin{otherlanguage}{czech}
 
 Naprogramujte v ANSI C přenositelnou \textbf{konzolovou aplikaci}, v podstatě
@@ -138,33 +142,36 @@ stručný návod k použití programu (v angličtině). Návratová hodnota funk
 \end{otherlanguage}
 
 \section{Problem analysis}
+\label{sec:analysis}
 
-Algorithmically, the assignment is relatively straightforward. Fundamentally,
-it's just a while loop, that executes the current instruction and, if
+Algorithmically, the assignment is relatively straightforward. It is
+fundamentally a while loop, that executes the current instruction and, if
 applicable, moves to the next one until either the \code{HALT} instruction is
-encountered or the end of file (\code{EOF}) is reached, or an error is detected.
+encountered or the end of a file (\code{EOF}) is reached, or an error is
+detected.
 
 The primary challenge of the assignment is, in my opinion, the management of raw
-binary data -- everything from reading of the input file to addressing both
-individual bytes and four-byte integers within the virtual memory. A closely
-related concern is the need for prevention of any out-of-bounds access to the
+binary data---everything from reading of the input file to addressing both
+individual bytes and four-byte integers within a virtual memory. A closely
+related concern is the necessary prevention of any out-of-bounds access to the
 memory.
 
-Another difficulty is the inherent duplication of code for each instruction,
+Another difficulty is the inherent repetition of code for each instruction,
 since they all generally need to do the whole read-evaluate-write loop with only
 minor variations. This could be solved most effectively by polymorphism and
 higher-order functions, but that's not available in C. Consequently, alternative
 methods for code reuse, such as helper functions or, more likely, macros, must
-be employed. However, caution must be exercised to avoid overuse, thereby
+be employed. However, caution must be exercised to avoid overuse and thereby
 ensuring the code remains comprehensible and easy to debug.
 
 \section{Implementation}
+\label{sec:impl}
 
 The internal state of the emulated computer is stored in a \code{struct} called
 \hyperlink{vm}{\code{VM}} (virtual machine). This struct holds all relevant
 data, such as registers (in a \hyperlink{registers}{\code{Registers}} struct),
 data, code and stack segments (and their sizes), the instruction pointer
-(\code{IP}) and a few other helper variables.
+(\code{IP}), and a few other helper variables.
 
 The program code is then segmented into two parts: driver code (the
 \code{src/vm.c} file) and VM code (the \code{src/instructions} subdirectory).
@@ -175,9 +182,9 @@ state changes.
 \subsection{Data Structures}
 
 The program does not utilize any complicated data structures; it employs
-primarily plain-old-data\footnote{officialy also known as passive data
-structures} containers accompanied by relevant functions in OOP-like style
-(first parameter being a pointer to the struct).
+primarily plain-old-data\footnote{also known as passive data structures}
+containers accompanied by relevant functions in OOP-like style (first parameter
+being a pointer to the struct).
 
 Main data structure of the program is the \hypertarget{vm}{\code{struct VM}}
 defined in \code{src/vm.h} as follows:
@@ -207,27 +214,27 @@ defined in \code{src/vm.h} as follows:
 \end{center}
 
 \begin{itemize}
-    \item \code{registers} - registers stored in a \code{struct} called
+    \item \code{registers} -- registers stored in a \code{struct} called
         \hyperlink{registers}{\code{Registers}} (further details below). 
-    \item \code{*_segment} - memory segments stored as \code{Byte} arrays, with
+    \item \code{*_segment} -- memory segments stored as \code{Byte} arrays, with
         sizes stored in respective \code{*_size} fields.
-    \item \code{IP} - instruction pointer, points to the current instruction in
+    \item \code{IP} -- instruction pointer, points to the current instruction in
         the \code{code_segment}.
-    \item \code{error_msg} - a buffer for error messages, preallocated to
+    \item \code{error_msg} -- a buffer for error messages, preallocated to
         \code{VM_ERROR_BUFFER_SIZE}.
-    \item \code{output} - a pointer to the file to which the output should be
+    \item \code{output} -- a pointer to the file to which the output should be
         written.
-    \item \code{flags} - a bitfield indicating conditions; set by the \code{CMP}
+    \item \code{flags} -- a bitfield indicating conditions; set by the \code{CMP}
         instruction, read by conditional jumps and zeroed otherwise. For
         possible values, see the \code{FLAG} enum.
-    \item \code{instructions_count} - the count of executed instructions, used
+    \item \code{instructions_count} -- the count of executed instructions, used
         for debugging.
-    \item \code{debug} - a flag indicating whether to print debug messages.
+    \item \code{debug} -- a flag indicating whether to print debug messages.
 \end{itemize}
 
 \begin{note}
-\code{Word} is an alias for \code{signed long int} - a word of the K's Machine - and
-\code{Byte} is an alias for \code{unsigned char} - a one byte.
+\code{Word} is an alias for \code{signed long int} -- a word of the K's Machine
+-- and \code{Byte} is an alias for \code{unsigned char} -- a one byte.
 \end{note}
 
 The \hypertarget{registers}{\code{Registers}} struct is defined as follows 
@@ -248,18 +255,43 @@ The \hypertarget{registers}{\code{Registers}} struct is defined as follows
 \end{tikzpicture}
 \end{center}
 
+\subsection{Algorithms}
+\label{sec:algorithms}
+
+Similarly to data structures, the assignment did not require complex algorithms.
+The primary algorithm, which constitutes the core of the program, is a
+straightforward infinite loop. During each iteration of this loop, a single byte
+is read from the code segment, and control is transferred to the corresponding
+handler function. 
+
 \subsection{Instructions}
+\label{sec:instructions}
 
-All instructions operate on a very simple basis: they load inputs from the code
-segment, execute the operation, store the result in either registers or the data
-segment of the memory and return control to the main loop. 
+All instruction handlers operate on a very simple basis: they load inputs from
+the code segment, execute an operation, store the result in either registers or
+the data segment of the memory and return control to the main loop. 
 
-The implicit contract states that when a handler is called, the instruction
-pointer is already pointing to the byte immediately following the opcode byte.
-And when the control is returned, the instruction pointer should point to the
-next instruction.
+\subsubsection{Handler Contract}
+\label{sec:contract}
+
+All instruction handlers adhere to a simple implicit contract that dictates the
+handling of the \code{VM} struct with following rules:
+
+\begin{itemize}
+    \item Handler is allowed to modify fields \code{IP}, \code{registers},
+        \code{flags}, and \code{error_msg}.
+    \item When a handler is called, the \code{IP} is pointing to the byte
+        immediately following the op-code byte. 
+    \item When the control is returned to the main loop, the instruction pointer
+        should point to the next instruction to be executed.
+    \item The handler should return status code according to the
+        \nameref{sec:errors} section.
+\end{itemize}
+
+
 
 \subsubsection{Repetition}
+\label{sec:repetition}
 
 As indicated in the problem analysis section, a significant effort was invested
 in the elimination of repetition in the implementation of the individual
@@ -268,7 +300,7 @@ necessitated a substantial amount of boilerplate code, particularly for error
 handling and propagation. Eventually, a rewrite of the instruction handlers into
 macros was implemented, which enabled for example the definition of any binary
 operation instruction handler on a single line, given only the name and
-operator. For more details, see the Macros section below.
+operator. For more details, see the section \nameref{sec:macros} below.
 
 This approach yielded a code that was almost two times shorter than the one
 created using the helper functions, while simultaneously enhancing the
@@ -279,70 +311,80 @@ the advantages of this approach outweigh the disadvantages, especially given
 that the project does not require long-term support and therefore
 maintainability is not a major concern.
 
-\subsubsection{Macros}
+\subsection{Macros}
+\label{sec:macros}
 
-All macros are applicable for the instruction handlers and expect a \code{vm}
-in the calling scope. Only exception is the \code{INSTRUCTION} family of macros
-that define the \code{vm} variable as a handler parameter.
+Due to inherent repetitiveness of the instruction handlers, it was necessary to
+define a set of macros to make the code more readable and maintainable. Thus,
+most of the used macros are applicable to the context of the instruction
+handlers and expect a \code{vm} in the calling scope. Only exception is the
+\code{INSTRUCTION} family of macros that define the \code{vm} variable as a
+handler parameter.
 
-Macros that "return" or "propagate" do so from the calling scope to its caller -
-that is, they expand to a \code{return} statement.
+\subsubsection{Macro conventions}
+\label{sec:macrosconventions}
+
+Macros that "return" or "propagate" do so from the calling scope to its caller
+-- that is, they expand to a \code{return} statement.
 
 The general conventions for macro arguments naming, specific use case is in the
 comment at the beginning of the macro definition:
 
 \begin{itemize}
-\item \code{reg} - a register
-\item \code{reg1} - the first register
-\item \code{reg2} - the second register
-\item \code{reg_s} - the source register
-\item \code{reg_d} - the destination register
-\item \code{address} - a memory address
-\item \code{type} - the data type for \code{var} declaration or for
-    \code{sizeof} when accessing memory
-\item \code{var} - the variable identifier to be defined, written to or read
-\item \code{val} - the value to be processed
-\item \code{code} - the code to be executed
+    \item \code{reg} -- a register
+    \item \code{reg1} -- the first register
+    \item \code{reg2} -- the second register
+    \item \code{reg_s} -- the source register
+    \item \code{reg_d} -- the destination register
+    \item \code{address} -- a memory address
+    \item \code{type} -- the data type for \code{var} declaration or for
+        \code{sizeof} when accessing memory
+    \item \code{var} -- the variable identifier to be defined, written to or read
+    \item \code{val} -- the value to be processed
+    \item \code{code} -- the code to be executed
 \end{itemize}
 
-A non-exhaustive list of most important macros used in the implementation with
-short descriptions:
+\subsubsection{List of defined macros}
+\label{sec:macroslist}
+
+A non-exhaustive list of the most important macros used in the instruction
+handlers implementations:
 
 \begin{itemize}
-\item \code{TRY(code)} - execute \code{code} and if an error occurs, propagate
-    it to the caller by returning the error code.
-\item \code{THROW_ERROR(code, ...)} - returns the error \code{code} to the
-    caller and sets the \code{vm->error_msg} using \code{sprintf}.
-\item \code{ASSERT(condition, ...)} - checks \code{condition} and if it
-    evaluates to \code{false}, throws an error using \code{THROW_ERROR} with
-    code \code{EXIT_FAILURE} from the \code{stdlib.h} header.
+    \item \code{DEBUG_PRINT(...)} -- if \code{vm->debug} is not equal to
+        \code{DEBUG_NONE}, print the \code{...} arguments using \code{printf}.
+    \item \code{DEBUG_PRINT_INSTRUCTION(name, reg1, reg2)} -- print debug
+        representation of the given register-register instruction.
+    \item \code{DEBUG_PRINT_INSTRUCTION_IM(name, reg, im)} -- print debug
+        representation of the given register-immediate instruction.
 
-\item \code{DEBUG_PRINT(...)} - if \code{vm->debug} is not \code{DEBUG_NONE},
-    print the \code{...} arguments using \code{printf}.
-% \item \code{DEBUG_PRINT_INSTRUCTION(name, reg1, reg2)} - print debug information
-%     about the given register-register instruction.
-% \item \code{DEBUG_PRINT_INSTRUCTION_IM(name, reg, im)} - print debug information
-%     about the given register-immediate instruction.
-
-\item \code{INSTRUCTION(name)} - defines a handler for the \code{name}
-    instruction.
+    \item \code{INSTRUCTION(name, code)} -- define a handler for an instruction
+        called \code{name} with \code{code} as body.
 \end{itemize}
 
-\subsection{Algorithms}
-
-In the same way that there were few data structures required, there were also no
-complex algorithms needed. The main algorithm, which forms "the core" of the
-program, is a simple infinite loop. Each iteration of this loop reads a single
-byte from the code segment and passes control to the handler code of the
-corresponding instruction.
+\begin{note}
+    See also the section \nameref{sec:errors} for a list of error related
+    macros.
+\end{note}
 
 \subsection{Error handling}
+\label{sec:errors}
 
-As previously stated in the Instructions section, the KMEMU emulator employs
-error handling through the use of macros, which streamline the process of
-checking conditions and propagating errors. The \code{ASSERT} macro, for
+As previously stated in the \nameref{sec:repetition} section, the KMEMU emulator
+employs error handling through the use of macros, which streamline the process
+of checking conditions and propagating errors. The \code{ASSERT} macro, for
 example, is used to verify conditions and throw human-readable errors if they
-are not met.
+are not met. Full list of related macros is provided below:
+
+\begin{itemize}
+\item \code{TRY(code)} -- execute \code{code} and if an error occurs, propagate
+    it to the caller by returning the error code.
+\item \code{THROW_ERROR(code, ...)} -- returns the error \code{code} to the
+    caller and sets the \code{vm->error_msg} using \code{sprintf}.
+\item \code{ASSERT(condition, ...)} -- checks \code{condition} and if it
+    evaluates to \code{false}, throws an error using \code{THROW_ERROR} with
+    code \code{EXIT_FAILURE} from the \code{stdlib.h} header.
+\end{itemize}
 
 An illustration of a practical use of the error handling macros is provided by
 the following example of the \code{ret} instruction implementation:
@@ -359,34 +401,57 @@ INSTRUCTION(ret, {
 })
 \end{minted}
 
-In the example, the \code{ASSERT} macro ensures that the stack is not empty
-before attempting to pop a value from it. If the condition fails, an error
+In the example, the \code{ASSERT} macro initially verifies that the stack is not
+empty before attempting to pop a value from it. If the condition fails, an error
 message is generated, and the error is propagated back to the caller.
+Subsequently, the \code{TRY} macro is employed to execute the pop operation
+itself, and if an error occurs (for instance, if the \code{vm->SP} points beyond
+the end of the stack), it is propagated back to the caller. Finally, the
+\code{ASSERT} macro is utilized to verify that the popped address is a valid
+address within the code segment.
 
-Next the \code{TRY} macro is used to execute the pop itself, and if an error
-occurs (possible if \code{SP} is beyond the end of the stack), it is propagated
-back to the caller.
+The utilization of error handling macros ensures consistent error handling
+throughout the emulator, thereby enhancing the clarity and safety of the code
+while simultaneously providing clear and informative error messages to the user.
 
 This approach simplifies code by reducing boilerplate and ensures consistent
 error handling throughout the emulator. The use of macros such as \code{ASSERT}
 and \code{THROW_ERROR} provides clear and concise error handling, enhancing the
-clarity and maintainability of the code.
+clarity and safety of the code.
 
-The emulator defines several error codes using constants in the file
-\code{src/defs.h}, which are used to indicate specific error conditions:
+\subsubsection{Error messages}
+\label{sec:errormessages}
+
+Human-readable error messages are propagated through the \code{vm->error_msg}
+buffer, which is preallocated to \code{VM_ERROR_BUFFER_SIZE} bytes during the
+initialization of the \code{VM} struct. As a convention, this field may be
+reallocated arbitrarily; however, it is imperative that the new size does not
+fall below the \code{VM_ERROR_BUFFER_SIZE}, and that the previous allocation is
+freed.
+
+\subsubsection{Error and exit codes}
+\label{sec:errorcodes}
+
+Within the emulator only two error codes are utilized: \code{EXIT_SUCCESS} and
+\code{EXIT_FAILURE} from the \code{stdlib.h} header.
+
+This stands in contrast to the user-facing exit codes defined in the file
+\code{src/defs.h}:
 
 \begin{itemize}
-    \item \code{EXIT_ARGS = 1}: Indicates an error with the program's arguments.
+    \item \code{EXIT_SUCCESS = 0}: Indicates successful program execution.
+    \item \code{EXIT_ARGS = 1}: Indicates an issue with the program's arguments.
     \item \code{EXIT_FILE = 2}: Indicates an error related to the format of the
         input file.
     \item \code{EXIT_UNKNOWN = 3}: Indicates an unknown instruction.
     \item \code{EXIT_EXEC = 4}: Indicates an error during program execution,
         such as attempted division by zero or out-of-bounds memory access.
-    \item \code{EXIT_MEMORY = 128}: Indicates a memory-related error, usually
-        due to an underlying \code{malloc} call returning \code{NULL}.
+    \item \code{EXIT_MEMORY = 128}: Indicates a host memory-related error,
+        usually due to a \code{malloc} call returning \code{NULL}.
 \end{itemize}
 
 \section{User manual}
+\label{sec:manual}
 
 The KMEMU program provides a command-line interface (CLI) that allows users to
 load and execute programs written in the KMX format as defined in the problem
@@ -401,9 +466,9 @@ The CLI accepts the following signature:
 
 
 \begin{itemize}
-    \item \code{\textlangle input_file\textrangle} - the path to the KMX file to
-        be loaded and executed.
-    \item \code{\textlangle output_file\textrangle} (optional) - the path to the
+    \item \code{\textlangle input_file\textrangle} -- the path to the KMX file to
+        be loaded and executed. 
+    \item \code{\textlangle output_file\textrangle} (optional) -- the path to the
         file to which the program output should be written. If omitted, the
         output is written to the standard output.
 \end{itemize}
@@ -412,13 +477,14 @@ Additionally, the program also reads the \code{DEBUG} environment variable. The
 following values are accepted as defined in the \code{DebugLevel} enum:
 
 \begin{itemize}
-    \item \code{0} or unset - no debug messages
-    \item \code{1} - print executed instructions
-    \item \code{2} - print executed instructions, state of the memory after each
+    \item \code{0} or unset -- no debug messages
+    \item \code{1} -- print executed instructions
+    \item \code{2} -- print executed instructions, state of the memory after each
         instruction and the runtime information
 \end{itemize}
 
 \section{Conclusion}
+\label{sec:conclusion}
 
 In summary, my KMEMU project accomplished its primary objective of developing a
 functional emulator for the theoretical K's Machine with a MISC architecture.
@@ -431,10 +497,10 @@ platforms. The key results achieved include:
         including arithmetic, memory access, conditionals, control flow and
         subroutine calls.
     \item \textbf{Performance}: The emulator demonstrated adequate performance
-        with reasonable times observed for various test programs on the
-        development machine, with an approximate runtime of around 12
-        nanoseconds per instruction. Specifically the sample bubble sort
-        program ran on average for 459 microseconds.
+        with reasonable times observed on various test programs on the
+        development machine, with an approximate runtime of 12 nanoseconds per
+        instruction. Specifically, the sample bubble sort program ran on average
+        for 459 microseconds.
     \item \textbf{Error Handling}: Robust error handling mechanisms were
         implemented to manage invalid instructions, out-of-bounds memory access,
         and other potential issues.
@@ -450,9 +516,12 @@ incorrect parameters are provided.
 However, two areas were identified where improvements could be made:
 
 \begin{itemize}
-    \item \textbf{Testing}: More extensive testing with a wider range of
-        programs would facilitate the identification and fix any potential edge
-        cases or bugs.
+    \item \textbf{Testing}: Although the project was successfully validated,
+        more extensive testing with a wider range of programs would facilitate
+        the identification and fix any potential edge cases or bugs that may
+        still be present. Especially handling of invalid or otherwise unexpected
+        inputs/programs (e.g., empty file, large file, jumps near bounds, stack
+        manipulations, etc.).
     \item \textbf{Code Maintenance}: The use of macros for instruction handling,
         while having significantly reduced code repetition, has also resulted in
         parts of the codebase becoming complex. It is therefore recommended that
