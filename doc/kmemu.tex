@@ -446,7 +446,7 @@ are not met. Full list of error handling macros:
 \item \code{TRY(code)} -- execute \code{code} and if an error occurs, propagate
     it to the caller by returning the error code.
 \item \code{THROW_ERROR(code, ...)} -- returns the error \code{code} to the
-    caller and sets the \code{vm->error_msg} using \code{sprintf}.
+    caller and \code{sprintf} the arguments into \code{vm->error_msg}.
 \item \code{ASSERT(condition, ...)} -- checks \code{condition} and if it
     evaluates to \code{false}, throws an error using \code{THROW_ERROR} with
     code \code{EXIT_FAILURE} from the \code{stdlib.h} header.
