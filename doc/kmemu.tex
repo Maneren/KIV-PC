@@ -1,8 +1,8 @@
 % LTeX: language=en-US
-\documentclass[12pt,a4paper,final]{article}
+\documentclass[10pt,a4paper,final]{article}
 \usepackage{a4wide}
 \usepackage[czech,english]{babel}
-\usepackage{hyphsubst}
+% \usepackage{hyphsubst}
 \usepackage{xevlna}
 \usepackage{lmodern}
 \usepackage{graphicx}
@@ -183,8 +183,8 @@ state changes.
 
 The program does not utilize any complicated data structures; it employs
 primarily plain-old-data\footnote{also known as passive data structures}
-containers accompanied by relevant functions in OOP-like style (first parameter
-being a pointer to the struct).
+containers accompanied by relevant functions in object-oriented programming-like
+style (first parameter being a pointer to the struct) prefixed with \code{vm_}.
 
 Main data structure of the program is the \hypertarget{vm}{\code{struct VM}}
 defined in \code{src/vm.h} as follows:
@@ -377,7 +377,8 @@ infallible macros:
         immediate value.
 
     \item \code{INSTRUCTION(name, code)} -- define a handler for an instruction
-        called \code{name} with \code{code} as body.
+        called \code{name} (prefixed with \code{vm_}) with \code{code} as its
+        body.
     \item \code{BINARY_OPERATION_REG_REG(name, op)} -- define a handler for a
         binary operation between two registers with \code{op} as the operator.
     \item \code{BINARY_OPERATION_REG_IM32(name, op)} -- define a handler for a
@@ -416,7 +417,9 @@ section \nameref{sec:errors}):
 \end{itemize}
 
 Practical example of the use of the instruction definition macros in the
-\code{load_reg_im32} instruction:
+\code{load_reg_im32} instruction. The instruction had two arguments: a register
+and an immediate value (address), and it reads a \code{Word} from the data
+segment at the address and writes it to the register.
 
 \begin{minted}{c}
 INSTRUCTION(load_reg_im32, {
@@ -428,10 +431,16 @@ INSTRUCTION(load_reg_im32, {
 })
 \end{minted}
 
-The \code{INSTRUCTION} macro is used to define the handler itself and all other
-is passed into it as the second argument. Then a register argument and a
-immediate value argument are read from the code segment and assigned to
-\code{reg} (with the value) and \code{val} respectively. The \code{DEBUG_PRINT_INSTRUCTION_IM}
+The \code{INSTRUCTION} macro is used to define a handler
+\code{vm_load_reg_im32}, with the body code as the second argument.
+Subsequently, a register argument and an immediate value argument are read from
+the code segment using \code{READ_ARG} and assigned to \code{reg} and \code{val}
+variables, respectively. If the debug mode is enabled, the
+\code{DEBUG_PRINT_INSTRUCTION_IM} macro prints a line in the format \code{"LOAD
+R1 0x0004"}. The \code{READ} macro then retrieves a \code{Word} from the data
+segment at the \code{address} specified, and assigns it to the \code{value}
+variable. Finally, the \code{WRITE_REG} macro writes the \code{value} to the
+register with the index \code{reg}.
 
 \subsection{Error handling}
 \label{sec:errors}
