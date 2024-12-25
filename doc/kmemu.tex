@@ -170,7 +170,7 @@ ensuring the code remains comprehensible and easy to debug.
 The internal state of the emulated computer is stored in a \code{struct} called
 \hyperlink{vm}{\code{VM}} (virtual machine). This struct holds all relevant
 data, such as registers (in a \hyperlink{registers}{\code{Registers}} struct),
-data, code and stack segments (and their sizes), the instruction pointer
+data, code, and stack segments (and their sizes), the instruction pointer
 (\code{IP}), and a few other helper variables.
 
 The program code is then segmented into two parts: driver code (the
@@ -660,8 +660,8 @@ However, two areas were identified where substantial improvements could be made:
 During the development of this project, several challenges were encountered,
 including managing raw binary data, preventing out-of-bounds memory access, and
 reducing code duplication for instruction handling. These challenges were
-addressed through careful design and the use of helper functions and later
-macros.
+addressed through careful design, meticulous checks and the use of helper
+functions and later macros.
 
 The development of KMEMU probed to be a valuable learning experience, offering
 insights into emulator development, C and assembly programming, and macro-based
