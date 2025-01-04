@@ -31,6 +31,7 @@ int init_vm_from_file(const char *input_filepath, const char *output_filepath,
     vm->output = stdout;
   }
 
+  // header
   char header[KMX_HEADER_SIZE + 1];
   header[KMX_HEADER_SIZE] = '\0';
 
@@ -46,6 +47,7 @@ int init_vm_from_file(const char *input_filepath, const char *output_filepath,
     return EXIT_FILE;
   }
 
+  // data size
   int data_size_header = 0;
 
   if (fread(&data_size_header, sizeof(int), 1, input) != 1) {
@@ -62,6 +64,7 @@ int init_vm_from_file(const char *input_filepath, const char *output_filepath,
 
   size_t data_size = (size_t)data_size_header;
 
+  // data segment
   SAFE_ALLOCATE(vm->data_segment, data_size, sizeof(Byte));
   vm->data_size = data_size;
 
@@ -71,6 +74,7 @@ int init_vm_from_file(const char *input_filepath, const char *output_filepath,
     return EXIT_FILE;
   }
 
+  // code segment
   SAFE_ALLOCATE(vm->code_segment, VM_MEMORY_SIZE, sizeof(Byte));
 
   size_t code_size =
@@ -91,21 +95,13 @@ int init_vm_from_file(const char *input_filepath, const char *output_filepath,
     return EXIT_FILE;
   }
 
+  // error message buffer
   SAFE_ALLOCATE(vm->error_msg, VM_ERROR_BUFFER_SIZE, sizeof(char));
 
   return EXIT_SUCCESS;
 }
 
-/**
- * @brief Run the VM
- *
- * @param vm The VM
- * @return int Exit code
- *
- * Will run the VM from start of the code segment until HALT is encountered or
- * the end of the code segment is reached. The exit code can be EXIT_SUCCESS or
- * any of the error codes defined in defs.h.
- */
+// Run the VM
 int vm_run(VM *vm) {
   clock_t start_time = clock();
   int halted = 0;
@@ -161,9 +157,7 @@ int vm_run(VM *vm) {
   return EXIT_SUCCESS;
 }
 
-/**
- * @brief Print the header of a data table
- */
+// Print the header row of a data table
 void print_header(void) {
   printf("      ");
 
@@ -177,13 +171,10 @@ void print_header(void) {
   printf("\n");
 }
 
-/**
- * @brief Pretty print a line of a data table
- *
- * @param index Current index
- * @param data The data
- * @param size Size of the data in bytes
- */
+// Pretty print a row of a data table
+//
+// The row is identified by the `index` of the first byte in the array `data`
+// of size `size`.
 void print_data_line(size_t index, const Byte *data, size_t size) {
   printf("%04lX:", index);
   for (size_t j = 0; j < 16; j++) {
@@ -201,12 +192,7 @@ void print_data_line(size_t index, const Byte *data, size_t size) {
   printf("\n");
 }
 
-/**
- * @brief Pretty print a data table to hexadecimal
- *
- * @param data The data
- * @param size Size of the data in bytes
- */
+// Pretty print a data table to hexadecimal
 void pretty_print_data(const Byte *data, size_t size) {
   print_header();
   for (size_t i = 0; i < size; i += 16) {
@@ -227,11 +213,7 @@ const char *byte_to_binary(int x) {
   return b;
 }
 
-/**
- * @brief Pretty print the state of the VM
- *
- * @param vm The VM
- */
+// Pretty print the state of the VM
 void vm_print(const VM *vm) {
   printf("Registers:\n");
   printf("A:  0x%08X\n", vm->registers.A);
@@ -254,11 +236,7 @@ void vm_print(const VM *vm) {
   printf("\n");
 }
 
-/**
- * @brief Free all memory allocated by the VM
- *
- * @param vm The VM
- */
+// Free all memory allocated by the VM
 void vm_free(VM *vm) {
   SAFE_FREE(&vm->data_segment);
   SAFE_FREE(&vm->code_segment);

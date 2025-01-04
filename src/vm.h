@@ -57,10 +57,13 @@ int init_vm_from_file(const char *input_filepath, const char *output_filepath,
 
 // Run the VM
 //
-// Assumes that the VM is initialized
+// Will run the VM from start of the code segment until HALT is encountered or
+// the end of the code segment is reached. The return code can be EXIT_SUCCESS
+// or any of the error codes defined in defs.h. Assumes that the VM is
+// initialized.
 int vm_run(VM *vm);
 
-// Print the current state of the VM
+// Pretty print the state of the VM
 void vm_print(const VM *vm);
 
 // Free the memory used by the VM
