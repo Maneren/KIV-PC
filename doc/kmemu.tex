@@ -21,11 +21,11 @@
 
 \usepackage[pdfborderstyle={/S/U/W 1}]{hyperref}
 \hypersetup{
-    colorlinks=true,
-    linkcolor=black,
-    filecolor=magenta,      
-    urlcolor=blue,
-    pdftitle={KMEMU - MISC CPU Computer Emulator},
+  colorlinks=true,
+  linkcolor=black,
+  filecolor=magenta,
+  urlcolor=blue,
+  pdftitle={KMEMU - MISC CPU Computer Emulator},
 }
 \urlstyle{same}
 
@@ -36,7 +36,10 @@
 
 \newlist{notes}{enumerate}{1}
 \setlist[notes]{label=Note: ,leftmargin=*}
-\newenvironment{note}[1]{\begin{notes}\item #1}{\end{notes}}
+\newenvironment{note}[1]{
+  \begin{notes}
+\item #1}{
+\end{notes}}
 
 \usemintedstyle{friendly}
 
@@ -48,16 +51,16 @@
 \begin{document}
 
 \begin{figure}[H]
-	\centering
-	\includegraphics[width=0.8\textwidth]{pic/kiv-cmyk-en}
+  \centering
+  \includegraphics[width=0.8\textwidth]{pic/kiv-cmyk-en}
 \end{figure}
 
 \vspace{.5cm}
 
 \begin{center}
-	\LARGE{KMEMU -- MISC CPU Computer Emulator}\\
-	\vspace{.5cm}
-	\large{Semester project -- KIV/PC 2024/25}
+  \LARGE{KMEMU -- MISC CPU Computer Emulator}\\
+  \vspace{.5cm}
+  \large{Semester project -- KIV/PC 2024/25}
 \end{center}
 
 \vfill
@@ -78,66 +81,74 @@ Department of Computer Science and Engineering \hfill \today
 \label{sec:assignment}
 \begin{otherlanguage}{czech}
 
-Naprogramujte v ANSI C přenositelnou \textbf{konzolovou aplikaci}, v podstatě
-jednoduchý, ale plně funkční, \textit{emulátor} teoretického počítače – nazvěme
-ho třeba K’s Machine (KM) – s procesorem architektury MISC (= Minimal
-Instruction Set Computer), který bude na hostitelském počítači vykonávat
-programy (v binární podobě, tj. ve strojovém kódu) pro níže popsaný
-minimalistický teoretický počítač.
+  Naprogramujte v ANSI C přenositelnou \textbf{konzolovou aplikaci}, v podstatě
+  jednoduchý, ale plně funkční, \textit{emulátor} teoretického
+  počítače – nazvěme
+  ho třeba K’s Machine (KM) – s procesorem architektury MISC (= Minimal
+  Instruction Set Computer), který bude na hostitelském počítači vykonávat
+  programy (v binární podobě, tj. ve strojovém kódu) pro níže popsaný
+  minimalistický teoretický počítač.
 
-Emulátor se bude spouštět příkazem
+  Emulátor se bude spouštět příkazem
 
-\begin{quotation}
-\code{X:\textbackslash>kmemu.exe \textlangle program.kmx\textrangle
-[\textlangle výstupní soubor[.txt]\textrangle]}
-\end{quotation}
+  \begin{quotation}
+    \code{X:\textbackslash>kmemu.exe \textlangle program.kmx\textrangle
+    [\textlangle výstupní soubor[.txt]\textrangle]}
+  \end{quotation}
 
-Symbol \code{\textlangle program ve strojovém kódu\textrangle} zastupuje povinný
-parametr – název vstupního binárního souboru s programem ve strojovém kódu pro
-procesor KM. Přípona \code{.kmx} (\foreignlanguage{english}{= \underline{K}’s
-\underline{M}achine E\underline{x}ecutable}; obdoba windowsovského \code{.exe},
-\foreignlanguage{english}{= \underline{Exe}cutable}), označující spustitelný
-soubor pro náš teoretický procesor, musí být vždy uvedena. Symbol
-\code{\textlangle výstupní soubor\textrangle} pak představuje nepovinný
-parametr, kterým je jméno textového souboru, do kterého se bude ukládat výstup
-při vykonávání programu, tj. informace/hodnoty, které emulátor vypisuje na
-obrazovku při vykonávání instrukcí programu. Není-li druhý, nepovinný, parametr
-uveden, směrujte výstup emulátoru do konzole (do standardního streamu
-\code{stdout}).
+  Symbol \code{\textlangle program ve strojovém kódu\textrangle}
+  zastupuje povinný
+  parametr – název vstupního binárního souboru s programem ve strojovém kódu pro
+  procesor KM. Přípona \code{.kmx} (\foreignlanguage{english}{= \underline{K}’s
+    \underline{M}achine E\underline{x}ecutable}; obdoba
+    windowsovského \code{.exe},
+  \foreignlanguage{english}{= \underline{Exe}cutable}), označující spustitelný
+  soubor pro náš teoretický procesor, musí být vždy uvedena. Symbol
+  \code{\textlangle výstupní soubor\textrangle} pak představuje nepovinný
+  parametr, kterým je jméno textového souboru, do kterého se bude ukládat výstup
+  při vykonávání programu, tj. informace/hodnoty, které emulátor vypisuje na
+  obrazovku při vykonávání instrukcí programu. Není-li druhý,
+  nepovinný, parametr
+  uveden, směrujte výstup emulátoru do konzole (do standardního streamu
+  \code{stdout}).
 
-Úkolem Vámi vyvinutého programu tedy bude:
+  Úkolem Vámi vyvinutého programu tedy bude:
 
-\begin{enumerate}
-\item Načíst prvním parametrem určený spustitelný soubor (program) ve strojovém
-    kódu ve formátu KMX pro níže popsaný teoretický procesor. \\
-\item Vytvořit (podle údajů uložených ve spustitelném souboru) kódový a datový
-    segment pro běh programu. \\
-\item Vykonat program uložený v kódovém segmentu provedením všech jeho
-    instrukcí, včetně smyček, volání podprogramů, atd. \\
-\item Provádí-li se právě instrukce, jejímž úkolem je vypsat nějaký údaj na
-    obrazovku, vypsat tento údaj do konzole, případně (je-li při spuštění
-    programu uveden nepovinný druhý parametr) uložit do specifikovaného
-    výstupního textového souboru. \\
-\item Po dokončení vykonávání programu uvolnit paměť obsazenou datovým a kódovým
-segmentem vykonávaného programu a následně emulátor ukončit. \\
+  \begin{enumerate}
+    \item Načíst prvním parametrem určený spustitelný soubor
+      (program) ve strojovém
+      kódu ve formátu KMX pro níže popsaný teoretický procesor. \\
+    \item Vytvořit (podle údajů uložených ve spustitelném souboru)
+      kódový a datový
+      segment pro běh programu. \\
+    \item Vykonat program uložený v kódovém segmentu provedením všech jeho
+      instrukcí, včetně smyček, volání podprogramů, atd. \\
+    \item Provádí-li se právě instrukce, jejímž úkolem je vypsat nějaký údaj na
+      obrazovku, vypsat tento údaj do konzole, případně (je-li při spuštění
+      programu uveden nepovinný druhý parametr) uložit do specifikovaného
+      výstupního textového souboru. \\
+    \item Po dokončení vykonávání programu uvolnit paměť obsazenou
+      datovým a kódovým
+      segmentem vykonávaného programu a následně emulátor ukončit. \\
 
-\end{enumerate}
+  \end{enumerate}
 
-Váš program může být během testování spuštěn například takto (v operačním
-systému Windows):
+  Váš program může být během testování spuštěn například takto (v operačním
+  systému Windows):
 
+  \begin{quotation}
+    \code{X:\textbackslash>kmemu.exe "E:\textbackslash My Work\textbackslash
+    Test\textbackslash mersenne.kmx"\ mersenne.txt}
+  \end{quotation}
 
-\begin{quotation}
-\code{X:\textbackslash>kmemu.exe "E:\textbackslash My Work\textbackslash
-Test\textbackslash mersenne.kmx"\ mersenne.txt}
-\end{quotation}
-
-Uvažujte všechny možné specifikace (uvedení úplné cesty, relativní cesty, atp.)
-jak vstupního, tak výstupního souboru, které jsou přípustné v daném operačním
-systému. Pokud nebude na příkazové řádce uveden alespoň jeden parametr (tj.
-jméno binárního spustitelného souboru ve formátu KMX), vypište chybové hlášení a
-stručný návod k použití programu (v angličtině). Návratová hodnota funkce
-\code{int main(...)} bude v tomto případě 1.
+  Uvažujte všechny možné specifikace (uvedení úplné cesty, relativní
+  cesty, atp.)
+  jak vstupního, tak výstupního souboru, které jsou přípustné v daném operačním
+  systému. Pokud nebude na příkazové řádce uveden alespoň jeden parametr (tj.
+  jméno binárního spustitelného souboru ve formátu KMX), vypište
+  chybové hlášení a
+  stručný návod k použití programu (v angličtině). Návratová hodnota funkce
+  \code{int main(...)} bude v tomto případě 1.
 
 \end{otherlanguage}
 
@@ -177,7 +188,7 @@ The program code is then segmented into two parts: driver code (the
 \code{src/vm.c} file) and VM code (the \code{src/instructions} subdirectory).
 The driver code handles CLI, IO and calling the relevant VM code, which in turn
 handles the execution of the individual instructions itself and the relevant
-state changes. 
+state changes.
 
 \subsection{Data Structures}
 
@@ -190,73 +201,74 @@ Main data structure of the program is the \hypertarget{vm}{\code{struct VM}}
 defined in \code{src/vm.h} as follows:
 
 \begin{center}
-\vspace{0.5cm}
-\begin{tikzpicture}
+  \vspace{0.5cm}
+  \begin{tikzpicture}
     \begin{class}[text width=8cm]{VM}{0,0}
-        \attribute{\code{registers} : \code{Registers}}
-        \attribute{\code{IP} : \code{size\_t}}
-        \attribute{\code{code_segment} : \code{Byte*}}
-        \attribute{\code{code_size} : \code{size_t}}
-        \attribute{\code{data_segment} : \code{Byte*}}
-        \attribute{\code{data_size} : \code{size_t}}
-        \attribute{\code{stack_segment} : \code{Byte*}}
-        \attribute{\code{stack_size} : \code{size_t}}
-        \attribute{\code{error_msg} : \code{char*}}
-        \attribute{\code{output} : \code{FILE*}}
-        \attribute{\code{flags} : \code{unsigned char}}
-        \attribute{\code{instructions_count} : \code{size_t}}
-        \attribute{\code{debug} : \code{DebugLevel}}
+      \attribute{\code{registers} : \code{Registers}}
+      \attribute{\code{IP} : \code{size\_t}}
+      \attribute{\code{code_segment} : \code{Byte*}}
+      \attribute{\code{code_size} : \code{size_t}}
+      \attribute{\code{data_segment} : \code{Byte*}}
+      \attribute{\code{data_size} : \code{size_t}}
+      \attribute{\code{stack_segment} : \code{Byte*}}
+      \attribute{\code{stack_size} : \code{size_t}}
+      \attribute{\code{error_msg} : \code{char*}}
+      \attribute{\code{output} : \code{FILE*}}
+      \attribute{\code{flags} : \code{unsigned char}}
+      \attribute{\code{instructions_count} : \code{size_t}}
+      \attribute{\code{debug} : \code{DebugLevel}}
 
-        \operation{\code{vm_run(VM *vm)} : \code{int}}
-        \operation{\code{vm_print(VM *vm)} : \code{void}}
-        \operation{\code{vm_free(VM *vm)} : \code{void}}
+      \operation{\code{vm_run(VM *vm)} : \code{int}}
+      \operation{\code{vm_print(VM *vm)} : \code{void}}
+      \operation{\code{vm_free(VM *vm)} : \code{void}}
     \end{class}
-\end{tikzpicture}
-\vspace{0.5cm}
+  \end{tikzpicture}
+  \vspace{0.5cm}
 \end{center}
 
 \begin{itemize}
-    \item \code{registers} -- registers stored in a \code{struct} called
-        \hyperlink{registers}{\code{Registers}} (further details below). 
-    \item \code{*_segment} -- memory segments stored as \code{Byte} arrays, with
-        sizes stored in respective \code{*_size} fields.
-    \item \code{IP} -- instruction pointer, points to the current instruction in
-        the \code{code_segment}.
-    \item \code{error_msg} -- a buffer for error messages, preallocated to
-        \code{VM_ERROR_BUFFER_SIZE}.
-    \item \code{output} -- a pointer to the file to which the output should be
-        written.
-    \item \code{flags} -- a bitfield indicating conditions; set by the \code{CMP}
-        instruction, read by conditional jumps and zeroed otherwise. For
-        possible values, see the \code{FLAG} enum.
-    \item \code{instructions_count} -- the count of executed instructions, used
-        for debugging.
-    \item \code{debug} -- a flag indicating whether to print debug messages.
+  \item \code{registers} -- registers stored in a \code{struct} called
+    \hyperlink{registers}{\code{Registers}} (further details below).
+  \item \code{*_segment} -- memory segments stored as \code{Byte} arrays, with
+    sizes stored in respective \code{*_size} fields.
+  \item \code{IP} -- instruction pointer, points to the current instruction in
+    the \code{code_segment}.
+  \item \code{error_msg} -- a buffer for error messages, preallocated to
+    \code{VM_ERROR_BUFFER_SIZE}.
+  \item \code{output} -- a pointer to the file to which the output should be
+    written.
+  \item \code{flags} -- a bitfield indicating conditions; set by the \code{CMP}
+    instruction, read by conditional jumps and zeroed otherwise. For
+    possible values, see the \code{FLAG} enum.
+  \item \code{instructions_count} -- the count of executed instructions, used
+    for debugging.
+  \item \code{debug} -- a flag indicating whether to print debug messages.
 \end{itemize}
 
 \begin{note}
-\code{Word} is an alias for \code{signed long int} -- a word of the K's Machine
--- and \code{Byte} is an alias for \code{unsigned char} -- a one byte.
+  \code{Word} is an alias for \code{signed long int} -- a word of the
+  K's Machine
+  -- and \code{Byte} is an alias for \code{unsigned char} -- a one byte.
 \end{note}
 
-The \hypertarget{registers}{\code{Registers}} struct is defined as follows 
+The \hypertarget{registers}{\code{Registers}} struct is defined as follows
 
 \begin{center}
-\vspace{0.5cm}
-\begin{tikzpicture}
+  \vspace{0.5cm}
+  \begin{tikzpicture}
     \begin{class}[text width=10cm]{Registers}{0,0}
-        \attribute{\code{A} : \code{Word}}
-        \attribute{\code{B} : \code{Word}}
-        \attribute{\code{C} : \code{Word}}
-        \attribute{\code{D} : \code{Word}}
-        \attribute{\code{S} : \code{Word}}
-        \attribute{\code{SP} : \code{Word}}
+      \attribute{\code{A} : \code{Word}}
+      \attribute{\code{B} : \code{Word}}
+      \attribute{\code{C} : \code{Word}}
+      \attribute{\code{D} : \code{Word}}
+      \attribute{\code{S} : \code{Word}}
+      \attribute{\code{SP} : \code{Word}}
 
-        \operation{\code{vm_get_reg(VM *vm, Byte reg, Word *out)} : \code{int}}
-        \operation{\code{vm_set_reg(VM *vm, Byte reg, Word value)} : \code{void}}
+      \operation{\code{vm_get_reg(VM *vm, Byte reg, Word *out)} : \code{int}}
+      \operation{\code{vm_set_reg(VM *vm, Byte reg, Word value)} : \code{void}}
     \end{class}
-\end{tikzpicture}
-\vspace{0.5cm}
+  \end{tikzpicture}
+  \vspace{0.5cm}
 \end{center}
 
 \subsection{Algorithms}
@@ -266,14 +278,14 @@ Similarly to data structures, the assignment did not require complex algorithms.
 The primary algorithm, which constitutes the core of the program, is a
 straightforward infinite loop. During each iteration of this loop, a single byte
 is read from the code segment, and control is transferred to the corresponding
-handler function. 
+handler function.
 
 \subsection{Instructions}
 \label{sec:instructions}
 
 All instruction handlers operate on a very simple basis: they load inputs from
 the code segment, execute an operation, store the result in either registers or
-the data segment of the memory and return control to the main loop. 
+the data segment of the memory and return control to the main loop.
 
 \subsubsection{Handler contract}
 \label{sec:contract}
@@ -282,17 +294,15 @@ All instruction handlers adhere to a simple implicit contract that dictates the
 handling of the \code{VM} struct with following rules:
 
 \begin{itemize}
-    \item Handler is allowed to modify fields \code{IP}, \code{registers},
-        \code{flags}, and \code{error_msg}.
-    \item When a handler is called, the \code{IP} is pointing to the byte
-        immediately following the op-code byte. 
-    \item When the control is returned to the main loop, the instruction pointer
-        should point to the next instruction to be executed.
-    \item The handler should return status code according to the guidelines in
-        the section \nameref{sec:errors}.
+  \item Handler is allowed to modify fields \code{IP}, \code{registers},
+    \code{flags}, and \code{error_msg}.
+  \item When a handler is called, the \code{IP} is pointing to the byte
+    immediately following the op-code byte.
+  \item When the control is returned to the main loop, the instruction pointer
+    should point to the next instruction to be executed.
+  \item The handler should return status code according to the guidelines in
+    the section \nameref{sec:errors}.
 \end{itemize}
-
-
 
 \subsubsection{Repetition}
 \label{sec:repetition}
@@ -346,17 +356,17 @@ The general conventions for macro arguments naming, specific use case is in the
 description of each macro:
 
 \begin{itemize}
-    \item \code{reg} -- a register
-    \item \code{reg1} -- the first register
-    \item \code{reg2} -- the second register
-    \item \code{reg_s} -- the source register
-    \item \code{reg_d} -- the destination register
-    \item \code{address} -- a memory address
-    \item \code{type} -- the data type for \code{var} declaration or for
-        \code{sizeof} when accessing memory
-    \item \code{var} -- the variable identifier to be defined, written to or read
-    \item \code{val} -- the value to be processed
-    \item \code{code} -- the code to be executed
+  \item \code{reg} -- a register
+  \item \code{reg1} -- the first register
+  \item \code{reg2} -- the second register
+  \item \code{reg_s} -- the source register
+  \item \code{reg_d} -- the destination register
+  \item \code{address} -- a memory address
+  \item \code{type} -- the data type for \code{var} declaration or for
+    \code{sizeof} when accessing memory
+  \item \code{var} -- the variable identifier to be defined, written to or read
+  \item \code{val} -- the value to be processed
+  \item \code{code} -- the code to be executed
 \end{itemize}
 
 \subsubsection{List of instruction macros}
@@ -368,52 +378,52 @@ definitions in the file \code{src/instruction/common.h}. First are the
 infallible macros:
 
 \begin{itemize}
-    \item \code{DEBUG_PRINT(...)} -- if \code{vm->debug} is not equal to
-        \code{DEBUG_NONE}, print the arguments using \code{printf}.
-    \item \code{DEBUG_PRINT_INSTRUCTION(name, reg1, reg2)} -- \code{DEBUG_PRINT}
-        a representation of the given instruction operating on two registers.
-    \item \code{DEBUG_PRINT_INSTRUCTION_IM(name, reg, im)} -- \code{DEBUG_PRINT}
-        a representation of the given instruction operating on a register and an
-        immediate value.
+  \item \code{DEBUG_PRINT(...)} -- if \code{vm->debug} is not equal to
+    \code{DEBUG_NONE}, print the arguments using \code{printf}.
+  \item \code{DEBUG_PRINT_INSTRUCTION(name, reg1, reg2)} -- \code{DEBUG_PRINT}
+    a representation of the given instruction operating on two registers.
+  \item \code{DEBUG_PRINT_INSTRUCTION_IM(name, reg, im)} -- \code{DEBUG_PRINT}
+    a representation of the given instruction operating on a register and an
+    immediate value.
 
-    \item \code{INSTRUCTION(name, code)} -- define a handler for an instruction
-        called \code{name} (prefixed with \code{vm_}) with \code{code} as its
-        body.
-    \item \code{BINARY_OPERATION_REG_REG(name, op)} -- define a handler for a
-        binary operation between two registers with \code{op} as the operator.
-    \item \code{BINARY_OPERATION_REG_IM32(name, op)} -- define a handler for a
-        binary operation between a register and an immediate value with
-        \code{op} as the operator.
+  \item \code{INSTRUCTION(name, code)} -- define a handler for an instruction
+    called \code{name} (prefixed with \code{vm_}) with \code{code} as its
+    body.
+  \item \code{BINARY_OPERATION_REG_REG(name, op)} -- define a handler for a
+    binary operation between two registers with \code{op} as the operator.
+  \item \code{BINARY_OPERATION_REG_IM32(name, op)} -- define a handler for a
+    binary operation between a register and an immediate value with
+    \code{op} as the operator.
 
-    \item \code{BYTES_TO(type, var, ptr)} -- convert little-endian bytes
-        starting at \code{ptr} to a \code{type} in platform endianness and
-        assign it the variable \code{var}.
-    \item \code{BYTES_FROM(type, var, ptr)} -- convert a \code{type var} to
-        little-endian bytes and write them to memory starting at \code{ptr}.
+  \item \code{BYTES_TO(type, var, ptr)} -- convert little-endian bytes
+    starting at \code{ptr} to a \code{type} in platform endianness and
+    assign it the variable \code{var}.
+  \item \code{BYTES_FROM(type, var, ptr)} -- convert a \code{type var} to
+    little-endian bytes and write them to memory starting at \code{ptr}.
 \end{itemize}
 
 And the fallible macros (details of their error handling are provided in the
 section \nameref{sec:errors}):
 
 \begin{itemize}
-    \item \code{READ(type, var, address)} -- read a \code{type} from the data
-        byte index \code{address} and assign it to \code{var}.
-    \item \code{WRITE(type, var, address)} -- write a \code{type} \code{var} to
-        the data segment at the byte index \code{address}.
-    
-    \item \code{READ_ARG(type, var)} -- read a \code{type} from the code segment
-        starting at \code{vm->IP} and assign it to \code{var}.
-    \item \code{READ_REG(reg, var)} -- read a \code{Word} from the register
-        with index \code{reg} and assign it to \code{var}.
-    \item \code{READ_REG_ARG(var, val)} -- read a value to variable \code{val} 
-        from a register given by the byte at the current \code{vm->IP} (the
-        register index is saved into \code{var}).
-    \item \code{READ_REG_DS_PAIR(reg, val)} -- read a pair of values from
-        registers given by arguments. Saves the first value in \code{val} with
-        suffix \code{_d} and the second value in \code{val} with suffix
-        \code{_s}. 
-    \item \code{WRITE_REG(reg, value)} -- write a \code{value} to the register
-        with index \code{reg}.
+  \item \code{READ(type, var, address)} -- read a \code{type} from the data
+    byte index \code{address} and assign it to \code{var}.
+  \item \code{WRITE(type, var, address)} -- write a \code{type} \code{var} to
+    the data segment at the byte index \code{address}.
+
+  \item \code{READ_ARG(type, var)} -- read a \code{type} from the code segment
+    starting at \code{vm->IP} and assign it to \code{var}.
+  \item \code{READ_REG(reg, var)} -- read a \code{Word} from the register
+    with index \code{reg} and assign it to \code{var}.
+  \item \code{READ_REG_ARG(var, val)} -- read a value to variable \code{val}
+    from a register given by the byte at the current \code{vm->IP} (the
+    register index is saved into \code{var}).
+  \item \code{READ_REG_DS_PAIR(reg, val)} -- read a pair of values from
+    registers given by arguments. Saves the first value in \code{val} with
+    suffix \code{_d} and the second value in \code{val} with suffix
+    \code{_s}.
+  \item \code{WRITE_REG(reg, value)} -- write a \code{value} to the register
+    with index \code{reg}.
 \end{itemize}
 
 Practical example of the use of the instruction definition macros in the
@@ -452,11 +462,12 @@ example, is used to verify conditions and throw human-readable errors if they
 are not met. Full list of error handling macros:
 
 \begin{itemize}
-\item \code{TRY(code)} -- execute \code{code} and if an error occurs, propagate
+  \item \code{TRY(code)} -- execute \code{code} and if an error
+    occurs, propagate
     it to the caller by returning the error code.
-\item \code{THROW_ERROR(code, ...)} -- returns the error \code{code} to the
+  \item \code{THROW_ERROR(code, ...)} -- returns the error \code{code} to the
     caller and \code{sprintf} the arguments into \code{vm->error_msg}.
-\item \code{ASSERT(condition, ...)} -- checks \code{condition} and if it
+  \item \code{ASSERT(condition, ...)} -- checks \code{condition} and if it
     evaluates to \code{false}, throws an error using \code{THROW_ERROR} with
     code \code{EXIT_FAILURE} from the \code{stdlib.h} header.
 \end{itemize}
@@ -514,17 +525,16 @@ This stands in contrast to the user-facing exit codes defined in the file
 \code{src/defs.h}:
 
 \begin{itemize}
-    \item \code{EXIT_SUCCESS = 0}: Indicates successful program execution.
-    \item \code{EXIT_ARGS = 1}: Indicates an issue with the program's arguments.
-    \item \code{EXIT_FILE = 2}: Indicates an error related to the format of the
-        input file.
-    \item \code{EXIT_UNKNOWN = 3}: Indicates an unknown instruction.
-    \item \code{EXIT_EXEC = 4}: Indicates an error during program execution,
-        such as attempted division by zero or out-of-bounds memory access.
-    \item \code{EXIT_MEMORY = 128}: Indicates a host memory-related error,
-        usually due to a \code{malloc} call returning \code{NULL}.
+  \item \code{EXIT_SUCCESS = 0}: Indicates successful program execution.
+  \item \code{EXIT_ARGS = 1}: Indicates an issue with the program's arguments.
+  \item \code{EXIT_FILE = 2}: Indicates an error related to the format of the
+    input file.
+  \item \code{EXIT_UNKNOWN = 3}: Indicates an unknown instruction.
+  \item \code{EXIT_EXEC = 4}: Indicates an error during program execution,
+    such as attempted division by zero or out-of-bounds memory access.
+  \item \code{EXIT_MEMORY = 128}: Indicates a host memory-related error,
+    usually due to a \code{malloc} call returning \code{NULL}.
 \end{itemize}
-
 
 \subsection{Memory management}
 
@@ -537,7 +547,7 @@ dynamically as required.
 
 To improve the safety of the memory management, the standard functions are
 wrapped into helper macros ,  and
-. Furthermore,  is used rather than 
+. Furthermore,  is used rather than
 to ensure the virtual memory is initialized to zero and thus behaves
 deterministically on every run, even if the user program read it before
 initialization.
@@ -551,59 +561,58 @@ behavior during every execution, even in instances where the user program
 accesses the memory prior to its own initialization.
 
 \begin{itemize}
-    \item \code{SAFE_ALLOCATE(ptr, size)} -- allocate a block of memory of
-        \code{size} bytes using \code{calloc}. In the event that the allocation
-        process encounters an error, the macro prints an error message directly
-        to the standard error stream and exits with an error code of
-        \code{EXIT_MEMORY}.
-    \item \code{SAFE_REALLOCATE(ptr, size)} -- reallocate a block of memory
-        \code{ptr} to \code{size} bytes using \code{realloc}. In the event that
-        the reallocation process encounters an error, the macro prints an
-        error message directly to the standard error stream and exits with an
-        error code of \code{EXIT_MEMORY}.
-    \item \code{SAFE_FREE(ptr)} -- free a block of memory \code{ptr} using
-        \code{free}. Accepts a pointer to the pointer that is to be freed, with
-        the intention of setting it to \code{NULL} following the completion of
-        the freeing process. This precautionary measure is implemented to
-        prevent instances of double frees. Moreover, if the passed pointer is
-        already \code{NULL}, it is simply ignored.
+  \item \code{SAFE_ALLOCATE(ptr, size)} -- allocate a block of memory of
+    \code{size} bytes using \code{calloc}. In the event that the allocation
+    process encounters an error, the macro prints an error message directly
+    to the standard error stream and exits with an error code of
+    \code{EXIT_MEMORY}.
+  \item \code{SAFE_REALLOCATE(ptr, size)} -- reallocate a block of memory
+    \code{ptr} to \code{size} bytes using \code{realloc}. In the event that
+    the reallocation process encounters an error, the macro prints an
+    error message directly to the standard error stream and exits with an
+    error code of \code{EXIT_MEMORY}.
+  \item \code{SAFE_FREE(ptr)} -- free a block of memory \code{ptr} using
+    \code{free}. Accepts a pointer to the pointer that is to be freed, with
+    the intention of setting it to \code{NULL} following the completion of
+    the freeing process. This precautionary measure is implemented to
+    prevent instances of double frees. Moreover, if the passed pointer is
+    already \code{NULL}, it is simply ignored.
 \end{itemize}
-
 
 \section{User manual}
 \label{sec:manual}
 
 The KMEMU program provides a command-line interface (CLI) that allows users to
 load and execute programs written in the KMX format as defined in the problem
-statement. 
+statement.
 
 The CLI accepts the following argument signature:
 
 \begin{quotation}
-\code{X:\textbackslash> kmemu.exe \textlangle input_file\textrangle\ 
-[\textlangle output_file\textrangle]}
+  \code{X:\textbackslash> kmemu.exe \textlangle input_file\textrangle\
+  [\textlangle output_file\textrangle]}
 \end{quotation}
 
-
 \begin{itemize}
-    \item \code{\textlangle input_file\textrangle} -- the path to the KMX file to
-        be loaded and executed. 
-    \item \code{\textlangle output_file\textrangle} (optional) -- the path to the
-        file to which the program output should be written. If omitted, the
-        output is written to the standard output.
+  \item \code{\textlangle input_file\textrangle} -- the path to the KMX file to
+    be loaded and executed.
+  \item \code{\textlangle output_file\textrangle} (optional) -- the path to the
+    file to which the program output should be written. If omitted, the
+    output is written to the standard output.
 \end{itemize}
 
 Additionally, the program also reads the \code{DEBUG} environment variable. The
 following values are accepted as defined in the \code{DebugLevel} enum:
 
 \begin{itemize}
-    \item \code{0} or unset -- no debug messages
-    \item \code{1} -- print log of executed instructions
-    \item \code{2} or greater -- print log of executed instructions, state of the memory
-        after each instruction and detailed runtime information at the end.
-        \textbf{Warning:} this option may produce a substantial amount of
-        output, potentially in the range of multiple gigabytes even for
-        relatively simple programs.
+  \item \code{0} or unset -- no debug messages
+  \item \code{1} -- print log of executed instructions
+  \item \code{2} or greater -- print log of executed instructions,
+    state of the memory
+    after each instruction and detailed runtime information at the end.
+    \textbf{Warning:} this option may produce a substantial amount of
+    output, potentially in the range of multiple gigabytes even for
+    relatively simple programs.
 \end{itemize}
 
 \section{Conclusion}
@@ -615,23 +624,23 @@ The emulator was implemented in standard C 99, ensuring high portability across
 different platforms. The key results achieved include:
 
 \begin{itemize}
-    \item \textbf{Functionality}: The emulator correctly executes programs
-        written in the KMX format, handling all specified instructions,
-        including arithmetic, memory access, conditionals, control flow and
-        subroutine calls.
-    \item \textbf{Performance}: The emulator demonstrated adequate performance
-        with reasonable speed observed on various test programs on the
-        development machine, with an approximate throughput of 80 million
-        instructions per second. For example, the sample bubble sort program
-        ran on average for 459 microseconds while executing 3846 instructions.
-    \item \textbf{Error Handling}: Robust error handling mechanisms were
-        implemented to manage invalid instructions, out-of-bounds memory access,
-        and other potential issues.
-    \item \textbf{Portability}: The emulator was successfully compiled and
-        executed on multiple platforms, including Windows, Linux and Android.
-    \item \textbf{User-Friendly Interface}: The CLI provided a user-friendly
-        interface for loading and executing KMX programs, that provides clear
-        and informative error messages in case of errors.
+  \item \textbf{Functionality}: The emulator correctly executes programs
+    written in the KMX format, handling all specified instructions,
+    including arithmetic, memory access, conditionals, control flow and
+    subroutine calls.
+  \item \textbf{Performance}: The emulator demonstrated adequate performance
+    with reasonable speed observed on various test programs on the
+    development machine, with an approximate throughput of 80 million
+    instructions per second. For example, the sample bubble sort program
+    ran on average for 459 microseconds while executing 3846 instructions.
+  \item \textbf{Error Handling}: Robust error handling mechanisms were
+    implemented to manage invalid instructions, out-of-bounds memory access,
+    and other potential issues.
+  \item \textbf{Portability}: The emulator was successfully compiled and
+    executed on multiple platforms, including Windows, Linux and Android.
+  \item \textbf{User-Friendly Interface}: The CLI provided a user-friendly
+    interface for loading and executing KMX programs, that provides clear
+    and informative error messages in case of errors.
 \end{itemize}
 
 The assignment was completed successfully, meeting all the specified
@@ -644,17 +653,17 @@ incorrect parameters are provided.
 However, two areas were identified where substantial improvements could be made:
 
 \begin{itemize}
-    \item \textbf{Testing}: Although the project was successfully validated,
-        more extensive testing with a wider range of programs would facilitate
-        the identification and fix any potential edge cases or bugs that may
-        still be present. Especially handling of invalid or otherwise unexpected
-        inputs/programs (e.g., empty file, large file, jumps near bounds, stack
-        manipulations, etc.).
-    \item \textbf{Code Maintenance}: The use of macros for instruction handling,
-        while having significantly reduced code repetition, has also resulted in
-        parts of the codebase becoming complex. It is therefore recommended that
-        these sections undergo refactoring for the purpose of enhancing
-        readability, in order to ensure better long-term maintainability.
+  \item \textbf{Testing}: Although the project was successfully validated,
+    more extensive testing with a wider range of programs would facilitate
+    the identification and fix any potential edge cases or bugs that may
+    still be present. Especially handling of invalid or otherwise unexpected
+    inputs/programs (e.g., empty file, large file, jumps near bounds, stack
+    manipulations, etc.).
+  \item \textbf{Code Maintenance}: The use of macros for instruction handling,
+    while having significantly reduced code repetition, has also resulted in
+    parts of the codebase becoming complex. It is therefore recommended that
+    these sections undergo refactoring for the purpose of enhancing
+    readability, in order to ensure better long-term maintainability.
 \end{itemize}
 
 During the development of this project, several challenges were encountered,
